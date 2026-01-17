@@ -87,7 +87,6 @@ end
 
 function sprites:palletSwap(targetSprite, origPallet, newPallet)
     if #origPallet == #newPallet then
-        
         local imgData = love.image.newImageData(sprites:getPathFromSprite(targetSprite))
 
         imgData:mapPixel(function(x, y, r, g, b, a)
