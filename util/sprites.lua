@@ -86,32 +86,34 @@ local function almostEqual(a,b,epsilon)
 end
 
 function sprites:palletSwap(targetSprite, origPallet, newPallet)
-    if #origPallet == #newPallet then
-        local imgData = love.image.newImageData(sprites:getPathFromSprite(targetSprite))
+    if newPallet ~= nil then
+        if #origPallet == #newPallet then
+            local imgData = love.image.newImageData(sprites:getPathFromSprite(targetSprite))
 
-        imgData:mapPixel(function(x, y, r, g, b, a)
-            local newR, newG, newB = r,g,b
+            imgData:mapPixel(function(x, y, r, g, b, a)
+                local newR, newG, newB = r,g,b
 
-        
+            
 
-            for _,i in pairs(origPallet.colourData) do
-                if almostEqual(r, Color(origPallet.colourData[_])[1]) then
-                    newR = Color(newPallet.colourData[_])[1]
+                for _,i in pairs(origPallet.colourData) do
+                    if almostEqual(r, Color(origPallet.colourData[_])[1]) then
+                        newR = Color(newPallet.colourData[_])[1]
+                    end
+
+                    if almostEqual(g, Color(origPallet.colourData[_])[2]) then
+                        newG = Color(newPallet.colourData[_])[2]
+                    end
+
+                    if almostEqual(b, Color(origPallet.colourData[_])[3]) then
+                        newB = Color(newPallet.colourData[_])[3]
+                    end
                 end
 
-                if almostEqual(g, Color(origPallet.colourData[_])[2]) then
-                    newG = Color(newPallet.colourData[_])[2]
-                end
+                return newR, newG, newB, a
+            end)
 
-                if almostEqual(b, Color(origPallet.colourData[_])[3]) then
-                    newB = Color(newPallet.colourData[_])[3]
-                end
-            end
-
-            return newR, newG, newB, a
-        end)
-
-        return love.graphics.newImage(imgData)
+            return love.graphics.newImage(imgData)
+        end
     end
 end
 

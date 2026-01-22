@@ -3,14 +3,33 @@ local tween = {}
 tween.activeTweens = {}
 
 function tween:createTween(startVal, endVal, duration, id, tweenType)
-    local chosenType = tweenType or nil
     local newTween = {
         startVal = startVal,
         endVal = endVal,
         duration = duration,
         elapsed = 0,
         value = startVal,
-        tweenType = chosenType
+        tweenType = tweenType or "linear",
+        sceneBegun = sceneM.activeScene
+    }
+
+    tween.activeTweens[id] = newTween
+    return newTween
+end
+
+function tween:tweenProperty(object, key, endValue, duration, id, tweenType)
+    local startValue = object[key]
+    
+    local newTween = {
+        object = object,   
+        key = key,        
+        startVal = startValue,
+        endVal = endValue,
+        duration = duration,
+        elapsed = 0,
+        value = startValue,
+        tweenType = tweenType or "linear",
+        sceneBegun = sceneM.activeScene
     }
 
     tween.activeTweens[id] = newTween
@@ -22,18 +41,38 @@ function tween:update(dt)
 end
 
 function tween:updateTweens(dt)
-    for t,t1 in pairs(tween.activeTweens) do
-        t1.elapsed = t1.elapsed + dt
+    for id, t in pairs(tween.activeTweens) do
+        t.elapsed = t.elapsed + dt
 
-        if t1.tweenType == "out" then
-            t1.value = tween:easeOut(t1.startVal, t1.endVal, t1.elapsed, t1.duration)
-        elseif t1.tweenType == "in" then
-            t1.value = tween:easeIn(t1.startVal, t1.endVal, t1.elapsed, t1.duration)
+        local newValue
+        if t.tweenType == "out" then
+            newValue = tween:easeOut(t.startVal, t.endVal, t.elapsed, t.duration)
+        elseif t.tweenType == "in" then
+            newValue = tween:easeIn(t.startVal, t.endVal, t.elapsed, t.duration)
         else
-            t1.value = tween:lerpTimed(t1.startVal, t1.endVal, t1.elapsed, t1.duration)
+            newValue = tween:lerpTimed(t.startVal, t.endVal, t.elapsed, t.duration)
+        end
+
+        t.value = newValue
+
+        if t.object and t.key then
+            t.object[t.key] = newValue
+        end
+
+        if t.elapsed >= t.duration then
+            tween.activeTweens[id] = nil
         end
     end
 end
+
+function tween:clearSceneTweens(newScene)
+    for id, tw in pairs(tween.activeTweens) do
+        if tw.sceneBegun ~= newScene then
+            tween.activeTweens[id] = nil
+        end
+    end
+end
+
 
 function tween:lerpTimed(startValue, endValue, elapsed, duration)
     local t = math.min(elapsed / duration, 1)
@@ -51,8 +90,5 @@ function tween:easeOut(startValue, endValue, elapsed, duration)
     t = 1 - (1 - t) * (1 - t) 
     return startValue + (endValue - startValue) * t
 end
-
-
-
 
 return tween

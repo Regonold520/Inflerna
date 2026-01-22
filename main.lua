@@ -1,6 +1,9 @@
 flowerM = require("flowerM")
 altarM = require("altarM")
 gardenM = require("gardenM")
+doorwayM = require("doorwayM")
+
+sceneM = require("sceneM")
 
 util = {}
 util.sprites = require("util/sprites")
@@ -9,7 +12,6 @@ util.tween = require("util/tween")
 
 
 input = require("input")
-
 
 cam = {
     x = 0,
@@ -32,21 +34,22 @@ function love.load()
 
 
     util.sprites:load()
+    sceneM:load()
 
-    flowerM:load()
-    altarM:load()
-
+    for s,s1 in pairs(sceneM.scenes) do
+        for f,f1 in ipairs(s1.managers) do
+            if f1.load ~= nil then f1:load() end
+        end
+    end
 end
 
 function love.update(dt)
 
-    
-    
-
     util.tween:update(dt)
-    flowerM:update(dt)
-    altarM:update(dt)
-    gardenM:update(dt)
+    
+    sceneM:update(dt)
+
+    input:cleanup(d)
 
     if input.mousejustpressed then
         input.mousejustpressed = false
@@ -56,7 +59,21 @@ end
 
 
 function love.keypressed(key, scancode, isrepeat)
-    gardenM:keypressed(key, scancode, isrepeat)
+    if sceneM.scenes[sceneM.activeScene] ~= nil then
+        for f,f1 in ipairs(sceneM.scenes[sceneM.activeScene].managers) do
+            if f1.keypressed ~= nil then
+                f1:keypressed(key, scancode, isrepeat)
+            end
+        end
+    end
+    
+    if scancode == "i" then
+        local new = "garden"
+        if sceneM.activeScene == "garden" then new = "inferno" end
+
+        sceneM:switchScene(new)
+
+    end
 end
 
 
@@ -72,16 +89,7 @@ function getWorldMouse()
 end
 
 function love.draw()
-    cam:attach()
-
-    love.graphics.draw(util.sprites:getSprite("eden_bg"), 0, 0, 0, 1, 1, util.sprites:getSprite("eden_bg"):getWidth()/2, util.sprites:getSprite("eden_bg"):getHeight()/2)
-
-
-    flowerM:draw()
-    altarM:draw()
-
-    cam:detach()
-    altarM:drawUI()
+    sceneM:draw()
 end
 
 function love.mousepressed(x, y, button, istouch)
