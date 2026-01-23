@@ -50,7 +50,7 @@ function flowerM:update(dt)
             end
         end
 
-        if i.growth < 50 and not i.hasBloomed then
+        if i.growth > 50 and not i.hasBloomed then
             i.hasBloomed = true
 
             local faces = {i.data.v1, i.data.v2}
@@ -58,7 +58,8 @@ function flowerM:update(dt)
                 head = util.sprites:getSprite("head-".. i.data.v1),
                 stem = util.sprites:getSprite("stem-".. i.data.v2 or i.data.v1),
                 face = util.sprites:getSprite("face-"..faces[ math.random( #faces ) ]),
-                sideBulb = util.sprites:getSprite("side_bulb")
+                sideBulb = util.sprites:getSprite("side_bulb"),
+                bulb = util.sprites:getSprite("bulb")
             }
 
             i.sprites.head = util.sprites:palletSwap(i.sprites.head, util.sprites.pallets.flowergray, util.sprites.pallets[i.data.chosenColour])
@@ -268,11 +269,49 @@ end
 
 function flowerM:getBloomedFlowers()
     local bloomed = {}
-    for f,f1 in pairs(flowerM.flowers) do
+
+    for _, f1 in pairs(flowerM.flowers) do
         if f1.hasBloomed then
-            table.insert(bloomed, f1)
+            local newFlower = {
+                x = f1.x,
+                y = f1.y,
+                growthStage = f1.growthStage,
+                growth = f1.growth,
+                hasBloomed = f1.hasBloomed,
+
+                data = {
+                    v1 = f1.data.v1,
+                    v2 = f1.data.v2,
+                    v3 = f1.data.v3,
+                    virtueList = f1.data.virtueList,
+                    chosenColour = f1.data.chosenColour
+                },
+
+                sprites = {
+                    head = f1.sprites.head,
+                    stem = f1.sprites.stem,
+                    face = f1.sprites.face,
+                    bulb = f1.sprites.bulb,
+                    sideBulb = f1.sprites.sideBulb
+                },
+
+
+                translation = {
+                    stem = {
+                        x = f1.translation.stem.x,
+                        y = f1.translation.stem.y
+                    },
+                    face = {
+                        x = f1.translation.face.x,
+                        y = f1.translation.face.y
+                    }
+                }
+            }
+
+            table.insert(bloomed, newFlower)
         end
     end
+
     return bloomed
 end
 
@@ -341,7 +380,7 @@ function flowerM:drawIndividualFlowerPot(flower, pot)
                 (flower.sprites.stem:getHeight()*2 - 3) - flower.sprites.head:getHeight()/2 + flower.sprites.face:getHeight()/2
             )
 
-            if flower.growth == 100 and flower.growthStage == "bloom" then
+            if flower.growth > 50 and flower.growthStage == "bloom" then
             local chosenV = flower.data.v2 or flower.data.v1
             if flowerM.stemBulbs[chosenV] ~= nil then
                 for b,b1 in pairs(flowerM.stemBulbs[chosenV]) do
@@ -382,8 +421,6 @@ function flowerM:drawIndividualFlower(flower,extraTrans)
         if extraTrans.scale ~=nil then newScaleMult = extraTrans.scale end
 
     end
-
-    print(newScaleMult)
 
 
     if flower ~= nil then
@@ -428,7 +465,7 @@ function flowerM:drawIndividualFlower(flower,extraTrans)
                 (flower.sprites.stem:getHeight()*2 - 3) - flower.sprites.head:getHeight()/2 + flower.sprites.face:getHeight()/2
             )
 
-            if flower.growth == 100 and flower.growthStage == "bloom" then
+            if flower.growth > 50 and flower.growthStage == "bloom" then
             local chosenV = flower.data.v2 or flower.data.v1
             if flowerM.stemBulbs[chosenV] ~= nil then
                 for b,b1 in pairs(flowerM.stemBulbs[chosenV]) do

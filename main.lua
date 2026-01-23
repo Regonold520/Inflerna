@@ -44,7 +44,6 @@ function love.load()
 end
 
 function love.update(dt)
-
     util.tween:update(dt)
     
     sceneM:update(dt)
@@ -66,7 +65,7 @@ function love.keypressed(key, scancode, isrepeat)
             end
         end
     end
-    
+
     if scancode == "i" then
         local new = "garden"
         if sceneM.activeScene == "garden" then new = "inferno" end

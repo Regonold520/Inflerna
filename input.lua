@@ -5,6 +5,7 @@ input.mousejustpressed = false
 function input:loopClickers()
     if sceneM.scenes[sceneM.activeScene] ~= nil then
         for c,c1 in pairs(sceneM.scenes[sceneM.activeScene].inputObjects) do
+
             if c1.dead ~= nil then
                 if c1.dead then
                     goto continue
@@ -19,13 +20,17 @@ function input:loopClickers()
             local mX, mY = getWorldMouse()
             if c1.isUi then
                 mX, mY = love.mouse.getPosition()
-                if mX > c1.x - (c1.sprite:getWidth()*cam.zoom) and mX < c1.x + (c1.sprite:getWidth()/2*cam.zoom) then
-                    if mY > c1.y - (c1.sprite:getHeight()/2*cam.zoom) and mY < c1.y + (c1.sprite:getHeight()/2*cam.zoom) then
-                        if c1.onClick ~= nil then
-                            c1:onClick()
-                        end
+                local halfW = (c1.sprite:getWidth() * cam.zoom) / 2
+                local halfH = (c1.sprite:getHeight() * cam.zoom) / 2
+
+                
+
+                if mX > c1.x - halfW and mX < c1.x + halfW then
+                    if mY > c1.y - halfH and mY < c1.y + halfH then
+                        if c1.onClick then c1:onClick() end
                     end
                 end
+
             else
                 if mX > c1.x - c1.sprite:getWidth()/2 and mX < c1.x + c1.sprite:getWidth()/2 then
                     if mY > c1.y - c1.sprite:getHeight()/2 and mY < c1.y + c1.sprite:getHeight()/2 then
@@ -35,8 +40,9 @@ function input:loopClickers()
                     end
                 end
             end
+            ::continue::
         end
-        ::continue::
+        
     end
 end
 
