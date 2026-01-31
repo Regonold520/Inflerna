@@ -1,17 +1,20 @@
-flowerM = require("flowerM")
-altarM = require("altarM")
-gardenM = require("gardenM")
-doorwayM = require("doorwayM")
+flowerM = require("scripts/garden/flowerM")
+altarM = require("scripts/garden/altarM")
+gardenM = require("scripts/garden/gardenM")
+doorwayM = require("scripts/garden/doorwayM")
 
-sceneM = require("sceneM")
+sceneM = require("scripts/util/sceneM")
+
+infernoIntermission = require("scripts/inferno/infernoIntermission")
+infernoM = require("scripts/inferno/infernoM")
+layerV = require("scripts/inferno/layerVisuals")
+playerM = require("scripts/inferno/playerM")
 
 util = {}
-util.sprites = require("util/sprites")
-util.tween = require("util/tween")
-
-
-
-input = require("input")
+util.sprites = require("scripts/util/sprites")
+util.tween = require("scripts/util/tween")
+util.time = require("scripts/util/time")
+util.input = require("scripts/util/input")
 
 cam = {
     x = 0,
@@ -32,8 +35,9 @@ function love.load()
     baseWidth = 1466
     baseHeight = 868
 
-
+    util.input:load()
     util.sprites:load()
+    util.time:load()
     sceneM:load()
 
     for s,s1 in pairs(sceneM.scenes) do
@@ -45,14 +49,15 @@ end
 
 function love.update(dt)
     util.tween:update(dt)
+    util.time:update(dt)
     
     sceneM:update(dt)
 
-    input:cleanup(d)
+    util.input:cleanup(d)
 
-    if input.mousejustpressed then
-        input.mousejustpressed = false
-        input:loopClickers()
+    if util.input.mousejustpressed then
+        util.input.mousejustpressed = false
+        util.input:loopClickers()
     end
 end
 
@@ -89,11 +94,12 @@ end
 
 function love.draw()
     sceneM:draw()
+    util.input:draw()
 end
 
 function love.mousepressed(x, y, button, istouch)
    if button == 1 then
-      input.mousejustpressed = true
+      util.input.mousejustpressed = true
    end
 end
 

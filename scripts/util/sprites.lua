@@ -117,4 +117,13 @@ function sprites:palletSwap(targetSprite, origPallet, newPallet)
     end
 end
 
+function sprites:drawObject(obj)
+    local sX = obj.scaleX or 1
+    local sY = obj.scaleY or 1
+    local oX = obj.originX or obj.sprite:getWidth()/2
+    local oY = obj.originY or obj.sprite:getHeight()/2
+
+    love.graphics.draw(obj.sprite, obj.x, obj.y, 0, sX, sY, oX, oY)
+end
+
 return sprites

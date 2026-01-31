@@ -7,6 +7,14 @@ function sceneM:load()
         gardenM, flowerM, altarM, doorwayM
     })
 
+    local infernoScene = sceneM:createScene("inferno",{
+        infernoIntermission, infernoM, layerV, playerM
+    })
+
+    infernoScene.onEnter = function()
+        infernoM:loadScene()
+    end
+
     gardenScene.onEnter = function()
         print("garbden")
         cam.x = 0
@@ -26,14 +34,16 @@ function sceneM:load()
 
         cam.roomPos = 0
     end
-
-    sceneM:switchScene("garden")
+    util.time:runDeferred(0.5, function() sceneM:switchScene("inferno") end)
+    
 end
 
 function sceneM:update(dt)
     if sceneM.scenes[sceneM.activeScene] ~= nil then
         for f,f1 in ipairs(sceneM.scenes[sceneM.activeScene].managers) do
-            f1:update(dt)
+            if f1.update ~= nil then
+                f1:update(dt)
+            end
         end
     end
 end

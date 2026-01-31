@@ -35,14 +35,19 @@ function altarM:load()
         end
     end
 
-    input:addClickable(altarM.altar,"garden")
+    util.input:addClickable(altarM.altar,"garden")
 
     altarM.confirmButton = {
+        sprite1 = util.sprites:getSprite("altar_confirmbutton"),
+        sprite2 = util.sprites:getSprite("altar_confirmbutton_agitated"),
+        sprite3 = util.sprites:getSprite("altar_confirmbutton_enraged"),
         sprite = util.sprites:getSprite("altar_confirmbutton"),
         x = 0,
         y = -22,
         sinY = 0,
-        rot = 0
+        rot = 0,
+        layer = 1,
+        intensity = 1
     }
 
     altarM.confirmButton.onClick = function()
@@ -81,9 +86,9 @@ function altarM:load()
                 end
             end
 
-            
+            blessedSeed.layer = 1
 
-            input:addClickable(blessedSeed,"garden")
+            util.input:addClickable(blessedSeed,"garden")
 
             util.tween:tweenProperty(altarM,"vignetteZoomMult" , 4, 1, "vignetteZoom", "out")
             util.tween:tweenProperty(altarM,"slotsZoomMult" , 4, 1, "slotsZoom", "out")
@@ -109,7 +114,7 @@ function altarM:load()
 
     end 
 
-    input:addClickable(altarM.confirmButton,"garden")
+    util.input:addClickable(altarM.confirmButton,"garden")
 
 
     altarM:populateVirtueButtons()
@@ -128,7 +133,6 @@ function altarM:populateVirtueButtons()
         
         newV.onClick = function()
             local removed = false
-            
             for slotName, slot in pairs(altarM.slots) do
                 if slot.virtue == v1 then
                     slot.virtue = nil
@@ -140,6 +144,7 @@ function altarM:populateVirtueButtons()
                     break 
                 end
             end
+
             
             if not removed then
                 local order = {"primary", "secondary", "tertiary"}
@@ -149,16 +154,27 @@ function altarM:populateVirtueButtons()
                         slot.virtue = v1
                         slot.sprite = util.sprites:getSprite(v1 .. "-icon")
 
+
                         local targetRot = math.deg(slot.rot) < 180 and math.rad(360) or 0
                         util.tween:tweenProperty(slot, "rot", targetRot, 0.7, name .. "Spin", "out")
                         break
                     end
                 end
             end
+
+            local totalEquipped = 0
+            for _, slot in pairs(altarM.slots) do
+                if slot.virtue ~= nil then
+                    totalEquipped = totalEquipped + 1
+                end
+            end
+
+            altarM.confirmButton.sprite = altarM.confirmButton["sprite" .. totalEquipped]
+            altarM.confirmButton.intensity = totalEquipped
         end
         
         table.insert(altarM.virtueButtons, newV)
-        input:addClickable(newV,"garden", true)
+        util.input:addClickable(newV,"garden", true)
     end
 end
 
@@ -208,8 +224,8 @@ function altarM:update(dt)
     altarM.slots.secondary.sinY = math.cos(deltaTimer*3+10)*8
     altarM.slots.tertiary.sinY = math.cos(deltaTimer*3+20)*8
 
-    altarM.confirmButton.sinY = math.cos(deltaTimer*2 + 50)
-    altarM.confirmButton.rot = math.sin(deltaTimer*2 + 50) / 10
+    altarM.confirmButton.sinY = math.cos((deltaTimer*2 + 50)* altarM.confirmButton.intensity)
+    altarM.confirmButton.rot = math.sin((deltaTimer*2 + 50)* altarM.confirmButton.intensity) / 10
 
     if util.tween.activeTweens.altarZoomIn ~= nil then
         cam.zoomModifier = util.tween.activeTweens.altarZoomIn.value

@@ -243,7 +243,8 @@ function flowerM:generateFlower(flowerInputs)
                 y = 0
             }
         },
-        growth = 0
+        growth = 0,
+        uuid = love.math.random()
     }
 
     if flowerM.stemData[stemID] ~= nil then
@@ -272,47 +273,52 @@ function flowerM:getBloomedFlowers()
 
     for _, f1 in pairs(flowerM.flowers) do
         if f1.hasBloomed then
-            local newFlower = {
-                x = f1.x,
-                y = f1.y,
-                growthStage = f1.growthStage,
-                growth = f1.growth,
-                hasBloomed = f1.hasBloomed,
-
-                data = {
-                    v1 = f1.data.v1,
-                    v2 = f1.data.v2,
-                    v3 = f1.data.v3,
-                    virtueList = f1.data.virtueList,
-                    chosenColour = f1.data.chosenColour
-                },
-
-                sprites = {
-                    head = f1.sprites.head,
-                    stem = f1.sprites.stem,
-                    face = f1.sprites.face,
-                    bulb = f1.sprites.bulb,
-                    sideBulb = f1.sprites.sideBulb
-                },
-
-
-                translation = {
-                    stem = {
-                        x = f1.translation.stem.x,
-                        y = f1.translation.stem.y
-                    },
-                    face = {
-                        x = f1.translation.face.x,
-                        y = f1.translation.face.y
-                    }
-                }
-            }
-
-            table.insert(bloomed, newFlower)
+            table.insert(bloomed, flowerM:cloneFlower(f1))
         end
     end
 
     return bloomed
+end
+
+function flowerM:cloneFlower(oldF)
+    local newFlower = {
+        x = oldF.x,
+        y = oldF.y,
+        growthStage = oldF.growthStage,
+        growth = oldF.growth,
+        hasBloomed = oldF.hasBloomed,
+
+        data = {
+            v1 = oldF.data.v1,
+            v2 = oldF.data.v2,
+            v3 = oldF.data.v3,
+            virtueList = oldF.data.virtueList,
+            chosenColour = oldF.data.chosenColour
+        },
+
+        sprites = {
+            head = oldF.sprites.head,
+            stem = oldF.sprites.stem,
+            face = oldF.sprites.face,
+            bulb = oldF.sprites.bulb,
+            sideBulb = oldF.sprites.sideBulb
+        },
+
+
+        translation = {
+            stem = {
+                x = oldF.translation.stem.x,
+                y = oldF.translation.stem.y
+            },
+            face = {
+                x = oldF.translation.face.x,
+                y = oldF.translation.face.y
+            }
+        },
+        uuid = oldF.uuid
+    }
+
+    return newFlower
 end
 
 function flowerM:generateSeed(flowerInputs)
@@ -417,9 +423,12 @@ end
 
 function flowerM:drawIndividualFlower(flower,extraTrans)
     local newScaleMult = 1
+    local faceXA = 0
     if extraTrans ~= nil then
         if extraTrans.scale ~=nil then newScaleMult = extraTrans.scale end
-
+        if extraTrans.face ~= nil then
+            if extraTrans.face.x ~= nil then faceXA = extraTrans.face.x end
+        end
     end
 
 
@@ -456,7 +465,7 @@ function flowerM:drawIndividualFlower(flower,extraTrans)
 
             love.graphics.draw(
                 flower.sprites.face,
-                flower.x + flower.translation.face.x + flower.translation.stem.x,
+                flower.x + flower.translation.face.x + flower.translation.stem.x + faceXA,
                 flower.y + flower.translation.face.y + flower.translation.stem.y,
                 0,
                 scaleM,
@@ -558,7 +567,7 @@ function flowerM:createPot()
             local newFlower = flowerM:generateFlower(flowerData)
             newPot:addFlower(newFlower)
 
-            input:markDead(newPot.scheduledSeed)
+            util.input:markDead(newPot.scheduledSeed)
             altarM.occupiedSeed = nil
 
             local count = 1
@@ -575,14 +584,59 @@ function flowerM:createPot()
 
     newPot.addFlower = function(self, flower)
         self.flower = flower
-        print(self.flower.data.v1)
     end
 
 
     table.insert(flowerM.pots, newPot)
-    input:addClickable(newPot,"garden")
+    util.input:addClickable(newPot,"garden")
 
     return newPot
+end
+
+function flowerM:generateRandomFlower()
+    local f = flowerM:generateFlower({
+        v1 = flowerM.virtues[love.math.random(#flowerM.virtues)],
+        v2 = flowerM.virtues[love.math.random(#flowerM.virtues)],
+        v3 = flowerM.virtues[love.math.random(#flowerM.virtues)],
+        virtueList = {},
+        chosenColour = nil
+    })
+
+    f.data.virtueList = {f.data.v1, f.data.v2, f.data.v3}
+    f.data.chosenColour = f.data.virtueList[love.math.random(#f.data.virtueList)]
+
+    f.growthStage, f.growth, f.hasBloomed = "bloom", 100, true
+
+    local faces = {f.data.v1, f.data.v2}
+    f.sprites = {
+        head = util.sprites:getSprite("head-" .. f.data.v1),
+        stem = util.sprites:getSprite("stem-" .. (f.data.v2 or f.data.v1)),
+        face = util.sprites:getSprite("face-" .. faces[math.random(#faces)]),
+        sideBulb = util.sprites:getSprite("side_bulb"),
+        bulb = util.sprites:getSprite("bulb")
+    }
+
+    f.sprites.head = util.sprites:palletSwap(f.sprites.head, util.sprites.pallets.flowergray, util.sprites.pallets[f.data.chosenColour])
+    local colour = f.data.v3 or f.data.v1
+    f.sprites.sideBulb = util.sprites:palletSwap(f.sprites.sideBulb, util.sprites.pallets.flowergray, util.sprites.pallets[colour])
+    f.sprites.face = util.sprites:palletSwap(f.sprites.face, util.sprites.pallets.flowergray, util.sprites.pallets[f.data.chosenColour])
+
+    local stemKey = f.data.v2 or f.data.v1
+    if flowerM.stemData[stemKey] ~= nil then
+        local faceTrans = flowerM.faceTranslations[f.data.v1] or { translation = { x = 0, y = 0 } }
+
+        f.translation = {
+            stem = {
+                x = flowerM.stemData[stemKey].translation.x,
+                y = flowerM.stemData[stemKey].translation.y
+            },
+            face = {
+                x = faceTrans.translation.x,
+                y = faceTrans.translation.y
+            }
+        }
+    end
+    return f
 end
 
 return flowerM

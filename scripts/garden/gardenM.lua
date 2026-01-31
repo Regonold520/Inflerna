@@ -16,10 +16,9 @@ function gardenM:load()
 
     gardenM.wateringCan.onClick = function()
         gardenM:switchTool("wateringCan")
-        print("walter",gardenM.currentTool)
     end
 
-    input:addClickable(gardenM.wateringCan,"garden")
+    util.input:addClickable(gardenM.wateringCan,"garden")
 end
 
 function gardenM:update(dt)
