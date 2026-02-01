@@ -60,8 +60,13 @@ function tween:updateTweens(dt)
         end
 
         if t.elapsed >= t.duration then
+            if t.object and t.key then
+                t.object[t.key] = t.endVal
+            end
+
             tween.activeTweens[id] = nil
         end
+
     end
 end
 

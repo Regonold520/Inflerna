@@ -9,6 +9,8 @@ infernoIntermission = require("scripts/inferno/infernoIntermission")
 infernoM = require("scripts/inferno/infernoM")
 layerV = require("scripts/inferno/layerVisuals")
 playerM = require("scripts/inferno/playerM")
+enemyM = require("scripts/inferno/enemyM")
+battleM = require("scripts/inferno/battleM")
 
 util = {}
 util.sprites = require("scripts/util/sprites")
@@ -49,11 +51,12 @@ end
 
 function love.update(dt)
     util.tween:update(dt)
+
     util.time:update(dt)
     
     sceneM:update(dt)
 
-    util.input:cleanup(d)
+    util.input:cleanup(dt)
 
     if util.input.mousejustpressed then
         util.input.mousejustpressed = false

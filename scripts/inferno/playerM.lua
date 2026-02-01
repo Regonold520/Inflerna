@@ -11,26 +11,16 @@ function playerM:load()
         scaleX = 1,
         sprite = util.sprites:getSprite("dante")
     }
-
-    
 end
 
 local deltaTimer = 0
 function playerM:update(dt)
-    print(#playerM.currentParty)
     deltaTimer = deltaTimer + dt
     playerM.player.scaleY = 1 + math.sin(deltaTimer*2)/20
     playerM.player.scaleX = 1 + math.cos(deltaTimer*2)/20
 end
 
 function playerM:draw()
-    util.sprites:drawObject(playerM.player)
-
-    for f,f1 in pairs(playerM.currentParty) do
-        flowerM:drawIndividualFlower(f1, {
-            face = {x=2}
-        })
-    end
 end
 
 function playerM:proceedForward(xAmount)
@@ -39,8 +29,11 @@ function playerM:proceedForward(xAmount)
     util.time:runDeferred(0.15, function() util.tween:tweenProperty(playerM.player, "x", playerM.player.x + xAmount, time - 0.15, "PlayerMoveX", "linear")   end)
 
     for f,f1 in pairs(playerM.currentParty) do
-        util.time:runDeferred(0 + ((f%2)/20), function() util.tween:tweenProperty(f1, "x", f1.x + xAmount, time- (f/20), f.."MoveX", "linear")  end)
+        util.time:runDeferred(0.15, function() util.tween:tweenProperty(f1, "x", f1.x + xAmount, time - 0.15, f.."MoveX", "linear")  end)
     end
+
+    
+    util.time:runDeferred(time + 0.15, function() battleM:startBattle(playerM.currentParty,{enemyM.enemies[1]}) end)
 end
 
 return playerM

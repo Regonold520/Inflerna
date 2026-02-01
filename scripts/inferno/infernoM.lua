@@ -14,6 +14,32 @@ function infernoM:update(dt)
 end
 
 function infernoM:draw()
+    local entities = {playerM.player, playerM.currentParty, enemyM.enemies}
+    local collatedDrawers = {}
+    for t,t1 in pairs(entities) do
+        if t1.sprite == nil then
+            for e,e1 in pairs(t1) do
+                table.insert(collatedDrawers, e1)
+            end
+        else
+            table.insert(collatedDrawers, t1)
+        end
+    end
+
+    table.sort(collatedDrawers, function(a, b)
+        return a.y < b.y
+    end)
+
+    for e,e1 in pairs(collatedDrawers) do
+        if e1.data ~= nil then
+            flowerM:drawIndividualFlower(e1, {
+                face = {x=2}
+            })
+        end
+        if e1.sprite ~= nil then
+            util.sprites:drawObject(e1)
+        end
+    end
 end
 
 function infernoM:drawUI()
@@ -60,7 +86,7 @@ function infernoM:loadScene()
     util.time:runDeferred(1, function() util.tween:tweenProperty(cam, "y", 0, 2, "CamMoveY", "out") end)
     util.time:runDeferred(1.2, function() util.tween:tweenProperty(playerM.player, "y", 90, 1.5, "PlayerMoveY", "in") end)
     util.time:runDeferred(1, function() util.tween:tweenProperty(infernoIntermission.panel, "y", -250, 2, "IntermissionMoveY", "out") end)
-    util.time:runDeferred(5, function() playerM:proceedForward(1000) end)
+    util.time:runDeferred(5, function() enemyM:spawnEnemy("crawler", "limbo", 200) end)
 end
 
 function infernoM:layerLoaded()

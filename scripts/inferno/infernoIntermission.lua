@@ -82,7 +82,9 @@ function intermission:generateInfernoOrder()
 end
 
 function intermission:shuffle(t)
-    for i = #t, 2, -1 do
+    local count = #t
+    
+    for i = count, 2, -1 do
         local j = math.random(i)
         t[i], t[j] = t[j], t[i]
     end

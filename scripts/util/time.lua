@@ -9,7 +9,7 @@ local deltaTimer = 0
 time.elapsedTime = 0
 function time:update(dt)
     deltaTimer = deltaTimer + dt
-    time.elapsedTime = tonumber(string.format("%.1f", deltaTimer))
+    time.elapsedTime = deltaTimer
 
     if #time.cachedCalls > 0 then
         local count = 1

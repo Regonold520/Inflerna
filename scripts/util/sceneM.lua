@@ -8,7 +8,7 @@ function sceneM:load()
     })
 
     local infernoScene = sceneM:createScene("inferno",{
-        infernoIntermission, infernoM, layerV, playerM
+        infernoIntermission,layerV, infernoM, playerM, enemyM, battleM
     })
 
     infernoScene.onEnter = function()
