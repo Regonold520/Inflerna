@@ -18,6 +18,8 @@ util.tween = require("scripts/util/tween")
 util.time = require("scripts/util/time")
 util.input = require("scripts/util/input")
 
+util.text = require("scripts/util/text")
+
 cam = {
     x = 0,
     y = -50,
@@ -26,6 +28,11 @@ cam = {
     rot = 0,
     yAddition = 0
 }
+
+cam.shake = function(strength)
+    cam.rot = math.rad(strength)
+    util.tween:tweenProperty(cam, "rot", 0, 1.5, "CamMoveRot", "out")
+end
 
 cam.zoomModifier = 1
 
@@ -40,8 +47,11 @@ function love.load()
     util.input:load()
     util.sprites:load()
     util.time:load()
+    util.text:load()
     sceneM:load()
 
+
+    
     for s,s1 in pairs(sceneM.scenes) do
         for f,f1 in ipairs(s1.managers) do
             if f1.load ~= nil then f1:load() end
@@ -66,6 +76,7 @@ end
 
 
 function love.keypressed(key, scancode, isrepeat)
+    
     if sceneM.scenes[sceneM.activeScene] ~= nil then
         for f,f1 in ipairs(sceneM.scenes[sceneM.activeScene].managers) do
             if f1.keypressed ~= nil then
@@ -92,8 +103,30 @@ function getScaleFactor()
 end
 
 function getWorldMouse()
-    return (love.mouse.getX() - love.graphics:getWidth()/2) / (cam.zoom * getScaleFactor()) + cam.x, (love.mouse.getY() - love.graphics:getHeight()/2) / (cam.zoom * getScaleFactor()) + cam.y
+    local mx, my = love.mouse.getPosition()
+
+    local cx = love.graphics.getWidth() / 2
+    local cy = love.graphics.getHeight() / 2
+
+    local dx = mx - cx
+    local dy = my - cy
+
+    local r = -math.rad(cam.rot)
+    local cosr = math.cos(r)
+    local sinr = math.sin(r)
+
+    local rdx = dx * cosr - dy * sinr
+    local rdy = dx * sinr + dy * cosr
+
+    local scale = (cam.zoom * cam.zoomModifier) * getScaleFactor()
+
+    local wx = (rdx / scale) + cam.x
+    local wy = (rdy / scale) + cam.y
+
+    return wx, wy
 end
+
+
 
 function love.draw()
     sceneM:draw()

@@ -89,7 +89,7 @@ function layerV:drawLayer()
     end
 
     for c,c1 in pairs(infernoM.loadedChunks) do
-        love.graphics.draw(infernoM.currentLayer.floorSprite,(c1.chunkWidth*c1.idx),100,0,1,1,infernoM.currentLayer.floorSprite:getWidth()/2,infernoM.currentLayer.floorSprite:getHeight()/2)
+        love.graphics.draw(infernoM.currentLayer.floorSprite,(c1.chunkWidth*c1.idx),125,0,1,1,infernoM.currentLayer.floorSprite:getWidth()/2,infernoM.currentLayer.floorSprite:getHeight()/2)
     end
 end
 

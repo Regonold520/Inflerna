@@ -87,7 +87,7 @@ end
 
 function sprites:palletSwap(targetSprite, origPallet, newPallet)
     if newPallet ~= nil then
-        if #origPallet == #newPallet then
+        if origPallet.size == newPallet.size then
             local imgData = love.image.newImageData(sprites:getPathFromSprite(targetSprite))
 
             imgData:mapPixel(function(x, y, r, g, b, a)
@@ -116,6 +116,42 @@ function sprites:palletSwap(targetSprite, origPallet, newPallet)
         end
     end
 end
+
+local function hexToRGB(hex)
+    hex = hex:gsub("#","")
+    local r = tonumber(hex:sub(1,2),16)/255
+    local g = tonumber(hex:sub(3,4),16)/255
+    local b = tonumber(hex:sub(5,6),16)/255
+    return r,g,b
+end
+
+function sprites:palletSwapPath(targetPath, origPallet, newPallet)
+    if not newPallet then return end
+    if #origPallet.colourData ~= #newPallet.colourData then return end
+
+    local imgData = love.image.newImageData(targetPath)
+
+    local map = {}
+    for i=1,#origPallet.colourData do
+        local oR,oG,oB = hexToRGB(origPallet.colourData[i])
+        local nR,nG,nB = hexToRGB(newPallet.colourData[i])
+        map[i] = {orig={oR,oG,oB}, new={nR,nG,nB}}
+    end
+
+    imgData:mapPixel(function(x,y,r,g,b,a)
+        for _,v in ipairs(map) do
+            local o,vv = v.orig, v.new
+            if r==o[1] and g==o[2] and b==o[3] then
+                return vv[1], vv[2], vv[3], a
+            end
+        end
+        return r,g,b,a
+    end)
+
+    return imgData
+end
+
+
 
 function sprites:drawObject(obj)
     local sX = obj.scaleX or 1

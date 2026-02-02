@@ -16,7 +16,6 @@ function sceneM:load()
     end
 
     gardenScene.onEnter = function()
-        print("garbden")
         cam.x = 0
         cam.projX = 0
     end
@@ -46,7 +45,7 @@ function sceneM:update(dt)
             end
         end
     end
-end
+end 
 
 function sceneM:draw()
     if sceneM.scenes[sceneM.activeScene] ~= nil then

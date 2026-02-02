@@ -219,7 +219,10 @@ function flowerM:registerFaceTranslation(id,x,y)
 end
 
 function flowerM:generateFlower(flowerInputs)
-    local stemID = flowerInputs.v2.. "-baby" or flowerInputs.v1.. "-baby"
+    local stemID = flowerInputs.v1.. "-baby"
+    if flowerInputs.v2 ~= nil then
+        stemID = flowerInputs.v2.. "-baby"
+    end
     local newFlower = {
         x = love.graphics:getWidth()/2,
         y = love.graphics:getHeight()/2,

@@ -56,11 +56,14 @@ function infernoM:loadScene()
     playerM.currentParty = {}
 
     for i=1,4 do
-        table.insert(doorwayM.party, flowerM:generateRandomFlower())
+        local newFlower = flowerM:generateRandomFlower()
+
+        table.insert(doorwayM.party, newFlower)
     end
 
     for f,f1 in pairs(doorwayM.party) do
         local cloned = flowerM:cloneFlower(f1)
+        battleM:addMoveSet(cloned)
         local yP, xP = 0
 
         if f == 1 then
