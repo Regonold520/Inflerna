@@ -3,6 +3,7 @@ local enemyM = {}
 enemyM.registeredEnemies = {}
 
 enemyM.enemies = {}
+enemyM.deletionTweens = {}
 
 function enemyM:load()
     enemyM:registerEnemies()
@@ -14,27 +15,45 @@ end
 function enemyM:draw()
 end
 
+local function deepCopy(orig, seen)
+    if type(orig) ~= "table" then
+        return orig
+    end
+
+    if seen and seen[orig] then
+        return seen[orig]
+    end
+
+    local copy = {}
+    seen = seen or {}
+    seen[orig] = copy
+
+    for k, v in pairs(orig) do
+        copy[deepCopy(k, seen)] = deepCopy(v, seen)
+    end
+
+    return setmetatable(copy, getmetatable(orig))
+end
 
 function enemyM:registerEnemies()
     enemyM:registerEnemy("crawler", "limbo")
 end
 
+function enemyM:protectedTween(obj, property, final, time, id, lerp)
+    if battleM.currentBattle == nil or battleM.currentBattle.phase ~= "enemy" then return end
+    table.insert(enemyM.deletionTweens, util.tween:tweenProperty(obj, property, final, time, id, lerp))
+end
+
 function enemyM:spawnEnemy(id, layerID, x)
-    local scr = enemyM.registeredEnemies[layerID][id].script
+    local attackDuration = enemyM.registeredEnemies[layerID][id].attackDuration or 1
 
-    local attackDuration = scr.attackDuration or 1
+    local newEnemy = deepCopy(enemyM.registeredEnemies[layerID][id])
 
-    local newEnemy = {
-        x = x,
-        y = 90,
-        originY = enemyM.registeredEnemies[layerID][id].sprite:getHeight(),
-        sprite = enemyM.registeredEnemies[layerID][id].sprite,
-        script = scr,
-        shield = scr.shield,
-        health = scr.health,
-        layer = enemyM.registeredEnemies[layerID][id].layerID,
-        attackDuration = attackDuration
-    }
+    util.hitbox:createHitbox(newEnemy, id, newEnemy.hitbox.scaleX, newEnemy.hitbox.scaleY, newEnemy.hitbox.offsetX, newEnemy.hitbox.offsetY)
+    
+    newEnemy.x = x
+    newEnemy.y = 90
+    newEnemy.originY = enemyM.registeredEnemies[layerID][id].sprite:getHeight()
 
     newEnemy.hit = function(damage, pierce)
         local piercePercent = pierce / 10
@@ -52,7 +71,6 @@ function enemyM:spawnEnemy(id, layerID, x)
         newEnemy.health = newEnemy.health - finalDamage
 
         if newEnemy.health <= 0 then newEnemy.die() else util.time:runDeferred(0.4,function()battleM.currentBattle.bulletAnim = false end) end
-        print(newEnemy.health)
     end
 
     newEnemy.die = function()
@@ -71,18 +89,13 @@ function enemyM:spawnEnemy(id, layerID, x)
     return newEnemy
 end
 
-function enemyM:registerEnemy(id, layerID, health, shield)
+
+function enemyM:registerEnemy(id, layerID)
     if enemyM.registeredEnemies[layerID] == nil then enemyM.registeredEnemies[layerID] = {} end
 
-    local enemy = {
-        x = 0,
-        y = 0,
-        sprite = util.sprites:getSprite(id),
-        script = require("scripts/enemies/".. layerID.. "/".. id),
-        layer = layerID,
-        shield = shield,
-        health = health
-    }
+    local enemy = require("scripts/enemies/"..layerID.. "/"..id)
+    enemy.sprite = util.sprites:getSprite(id)
+    enemy.layer = layerID
 
     enemyM.registeredEnemies[layerID][id] = enemy
 end

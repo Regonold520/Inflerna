@@ -29,7 +29,8 @@ function tween:tweenProperty(object, key, endValue, duration, id, tweenType)
         elapsed = 0,
         value = startValue,
         tweenType = tweenType or "linear",
-        sceneBegun = sceneM.activeScene
+        sceneBegun = sceneM.activeScene,
+        id = id
     }
 
     tween.activeTweens[id] = newTween

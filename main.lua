@@ -17,8 +17,8 @@ util.sprites = require("scripts/util/sprites")
 util.tween = require("scripts/util/tween")
 util.time = require("scripts/util/time")
 util.input = require("scripts/util/input")
-
 util.text = require("scripts/util/text")
+util.hitbox = require("scripts/util/hitbox")
 
 cam = {
     x = 0,
@@ -48,6 +48,7 @@ function love.load()
     util.sprites:load()
     util.time:load()
     util.text:load()
+    util.hitbox:load()
     sceneM:load()
 
 
@@ -67,6 +68,7 @@ function love.update(dt)
     sceneM:update(dt)
 
     util.input:cleanup(dt)
+    util.hitbox:update(dt)
 
     if util.input.mousejustpressed then
         util.input.mousejustpressed = false
@@ -131,6 +133,7 @@ end
 function love.draw()
     sceneM:draw()
     util.input:draw()
+    util.hitbox:draw()
 end
 
 function love.mousepressed(x, y, button, istouch)

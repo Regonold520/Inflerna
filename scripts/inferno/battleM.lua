@@ -13,7 +13,11 @@ end
 function battleM:update(dt)
     if battleM.currentBattle ~= nil then
         if battleM.currentBattle.phase == "enemy" then
-            print(battleM.currentBattle.playerReturn.y - playerM.player.y)
+
+            for e,e1 in pairs(battleM.currentBattle.enemies) do
+                e1:update(dt)
+            end
+
             local moveVec = {x=0,y=0}
             if love.keyboard.isDown("a") then
                 moveVec.x = -playerSpeed end
@@ -103,7 +107,6 @@ function battleM:genMoveButtons()
 
                         util.time:runDeferred(0.7, function()
                             if battleM.currentBattle.enemies[1] ~= nil then
-                                print("kjwogbwuibgoi")
                                 if battleM.currentBattle.party[moveButton.flowerIdx].data.moveSet[moveButton.buttonID] ~= nil then
                                     if moveButton.flowerIdx < #battleM.currentBattle.party then
                                         battleM:moveMoveButtons(moveButton.flowerIdx + 1)
@@ -131,7 +134,6 @@ function battleM:resetAfterKill(enemy)
     battleM.currentBattle.enemies[1] = nil
 
     battleM.bullets = {}
-    print("lerio",battleM.currentBattle.camTrans.zoom)
     util.tween.activeTweens["CamMoveX"] = nil
     util.tween.activeTweens["CamMoveY"] = nil
     util.tween.activeTweens["CamMoveZoom"] = nil
@@ -156,7 +158,13 @@ end
 function battleM:startBattle(party,enemies)
     battleM.currentBattle = nil
     if battleM.currentBattle == nil then
-        print("beyattle started")
+        local enemyReturns = {}
+
+        for e,e1 in pairs(enemies) do
+            enemyReturns[e] = {x=e1.x, y=e1.y}
+            e1.id = e
+        end
+         
         local battleEntry = {
             party = party,
             enemies = enemies,
@@ -164,6 +172,7 @@ function battleM:startBattle(party,enemies)
             camTrans = {x=cam.x, y=cam.y, zoom=cam.zoom},
             bulletAnim = false,
             playerReturn = {x=playerM.player.x, y=playerM.player.y},
+            enemyReturns = enemyReturns
         }
 
         battleM.currentBattle = battleEntry
@@ -175,6 +184,19 @@ end
 function battleM:playerPhase()
     playerM.player.x = battleM.currentBattle.playerReturn.x
     playerM.player.y = battleM.currentBattle.playerReturn.y
+
+    for t,t1 in pairs(enemyM.deletionTweens) do
+        util.tween.activeTweens[t1.id] = nil
+    end
+
+    for e,e1 in pairs(battleM.currentBattle.enemies) do 
+        
+
+        e1.x = battleM.currentBattle.enemyReturns[e].x
+        e1.y = battleM.currentBattle.enemyReturns[e].y
+    end
+
+
     if battleM.currentBattle.phase == "enemy" then
         for f,f1 in ipairs(battleM.currentBattle.party) do
             util.tween:tweenProperty(f1, "x", f1.x + ((playerM.player.x - f1.x)*2) , 0.4, "FlowerXMove"..f, "out")
@@ -206,6 +228,10 @@ end
 function battleM:enemyPhase()
     battleM.currentBattle.phase = "enemy"
 
+    for e,e1 in pairs(battleM.currentBattle.enemies) do 
+        e1:load()
+    end
+
     util.tween:tweenProperty(cam, "zoom", battleM.currentBattle.camTrans.zoom, 0.8, "CamMoveZoom", "out")
     util.tween:tweenProperty(cam, "x", battleM.currentBattle.camTrans.x, 0.8, "CamMoveX", "out")
     util.tween:tweenProperty(cam, "y", battleM.currentBattle.camTrans.y , 0.8, "CamMoveY", "out")
@@ -223,7 +249,6 @@ function battleM:enemyPhase()
 end
 
 function battleM:moveMoveButtons(idx)
-    print("hi")
     for b,b1 in ipairs(battleM.moveButtons) do
         b1.flowerIdx = idx
         b1.sprite = util.sprites:getSprite(battleM.currentBattle.party[idx].data.v1.. "_move_button")

@@ -11,6 +11,16 @@ function playerM:load()
         scaleX = 1,
         sprite = util.sprites:getSprite("dante")
     }
+
+    playerM.player.hitboxEnter = function()
+        print("they dont know i know this tech!")
+    end
+
+    playerM.player.hitboxExit = function()
+        print("shit they knew :(")
+    end
+
+    util.hitbox:createHitbox(playerM.player, "Player", 16, 20, 2, -10)
 end
 
 local deltaTimer = 0
