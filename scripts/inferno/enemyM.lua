@@ -44,10 +44,35 @@ function enemyM:protectedTween(obj, property, final, time, id, lerp)
     table.insert(enemyM.deletionTweens, util.tween:tweenProperty(obj, property, final, time, id, lerp))
 end
 
+function enemyM:hurtFlower(idx, damage)
+    if battleM.currentBattle ~= nil then
+        battleM.currentBattle.party[idx].health = battleM.currentBattle.party[idx].health - damage 
+        if battleM.currentBattle.party[idx].health <= 0 then
+            table.remove(playerM.currentParty,idx)
+        end
+
+        if #battleM.currentBattle.party <= 0 then
+            sceneM:switchScene("inferno")
+        end
+    end
+end
+
 function enemyM:spawnEnemy(id, layerID, x)
     local attackDuration = enemyM.registeredEnemies[layerID][id].attackDuration or 1
 
     local newEnemy = deepCopy(enemyM.registeredEnemies[layerID][id])
+
+    newEnemy.maxHealth = newEnemy.health
+
+    newEnemy.healthBar = {
+        x = newEnemy.x,
+        y = newEnemy.y,
+        offsetX = 200,
+        offsetY = 0,
+        fullSprite = util.sprites:getSprite("healthbar-full"),
+        emptySprite = util.sprites:getSprite("healthbar-empty"),
+        sprite = util.sprites:getSprite("healthbar-full"),
+    }
 
     util.hitbox:createHitbox(newEnemy, id, newEnemy.hitbox.scaleX, newEnemy.hitbox.scaleY, newEnemy.hitbox.offsetX, newEnemy.hitbox.offsetY)
     

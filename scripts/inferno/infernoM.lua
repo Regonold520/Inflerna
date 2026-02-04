@@ -16,6 +16,9 @@ end
 function infernoM:draw()
     local entities = {playerM.player, playerM.currentParty, enemyM.enemies}
     local collatedDrawers = {}
+
+    
+
     for t,t1 in pairs(entities) do
         if t1.sprite == nil then
             for e,e1 in pairs(t1) do
@@ -40,30 +43,78 @@ function infernoM:draw()
             util.sprites:drawObject(e1)
         end
     end
+
 end
+
+
+
 
 function infernoM:drawUI()
 end
 
 function infernoM:loadScene()
+
+    battleM.currentBattle = nil
+    battleM.bullets = {}
+    battleM.moveButtons = {}
+
+    enemyM.enemies = {}
+    enemyM.deletionTweens = {}
+
+    infernoM.generatedChunks = {}
+    infernoM.loadedChunks = {}
+    infernoM.currentChunk = 0
+    infernoM.currentLayer = nil
+
+    playerM:makePlayer()
+
+    for id, tw in pairs(util.tween.activeTweens) do
+        if tw.sceneBegun == "inferno" then
+            util.tween.activeTweens[id] = nil
+        end
+    end
+
+
+    for id, call in pairs(util.time.cachedCalls) do
+        if call.sceneBegun == "inferno" then
+            util.time.cachedCalls[id] = nil
+        end
+    end
+
+
+    infernoIntermission:createPanel()
     
     cam.x = 0
     cam.y = -250
     cam.zoom = 3.5
+    cam.rot = 0
     
     infernoM:loadLayer("limbo") 
 
     playerM.currentParty = {}
 
-    for i=1,4 do
-        local newFlower = flowerM:generateRandomFlower()
+    if #doorwayM.party <= 0 then
+        for i=1,4 do
+            local newFlower = flowerM:generateRandomFlower()
 
-        table.insert(doorwayM.party, newFlower)
+            table.insert(doorwayM.party, newFlower)
+        end
     end
 
     for f,f1 in pairs(doorwayM.party) do
         local cloned = flowerM:cloneFlower(f1)
         battleM:addMoveSet(cloned)
+
+        cloned.healthBar = {
+            x = cloned.x,
+            y = cloned.y,
+            offsetX = -200,
+            offsetY = 0,
+            fullSprite = util.sprites:getSprite("healthbar-full"),
+            emptySprite = util.sprites:getSprite("healthbar-empty"),
+            sprite = util.sprites:getSprite("healthbar-full"),
+        }
+        
         local yP, xP = 0
 
         if f == 1 then

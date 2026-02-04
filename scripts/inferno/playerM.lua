@@ -3,6 +3,9 @@ local playerM = {}
 playerM.currentParty = {}
 
 function playerM:load()
+end
+
+function playerM:makePlayer()
     playerM.player = {
         x = -100,
         y = -250,

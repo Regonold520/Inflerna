@@ -159,7 +159,10 @@ function sprites:drawObject(obj)
     local oX = obj.originX or obj.sprite:getWidth()/2
     local oY = obj.originY or obj.sprite:getHeight()/2
 
-    love.graphics.draw(obj.sprite, obj.x, obj.y, 0, sX, sY, oX, oY)
+    local offsetX = obj.offsetX or 0
+    local offsetY = obj.offsetY or 0
+
+    love.graphics.draw(obj.sprite, obj.x + offsetX, obj.y + offsetY, 0, sX, sY, oX, oY)
 end
 
 return sprites

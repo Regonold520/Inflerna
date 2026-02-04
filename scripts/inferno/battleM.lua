@@ -33,7 +33,21 @@ function battleM:update(dt)
             playerM.player.x = clamp(battleM.currentBattle.playerReturn.x - 10, playerM.player.x + moveVec.x, battleM.currentBattle.playerReturn.x + 230)
             playerM.player.y = clamp(battleM.currentBattle.playerReturn.y - 16, playerM.player.y + moveVec.y, battleM.currentBattle.playerReturn.y + 34)
         end
+
+        for e,e1 in pairs(battleM.currentBattle.enemies) do
+            if e1.healthBar ~= nil then
+                e1.healthBar.x = battleM.currentBattle.enemyReturns[e].x
+                e1.healthBar.y = battleM.currentBattle.enemyReturns[e].y - 33
+            end
+        end
     end
+
+    for f,f1 in pairs(playerM.currentParty) do
+        f1.healthBar.x = f1.x
+        f1.healthBar.y = f1.y - 33
+    end
+
+    
 end
 
 function battleM:draw()
@@ -42,10 +56,30 @@ function battleM:draw()
     end
 
     for b,b1 in ipairs(battleM.moveButtons) do
+
+    end 
+
+    for b,b1 in ipairs(battleM.moveButtons) do
         if battleM.currentBattle ~= nil then
-            if battleM.currentBattle.party[b1.flowerIdx].data.moveSet[b] ~= nil then
-                util.sprites:drawObject(b1)
-                b1.label:draw()
+            if battleM.currentBattle.party[b1.flowerIdx] ~= nil then
+                if battleM.currentBattle.party[b1.flowerIdx].data.moveSet[b] ~= nil then
+                    util.sprites:drawObject(b1)
+                    b1.label:draw()
+                end
+            end
+        end
+    end
+
+    for _, flower in pairs(playerM.currentParty) do
+        local hpPercent = flower.health / flower.maxHealth
+        battleM:drawHealthBar(flower.healthBar, hpPercent)
+    end
+
+    if battleM.currentBattle ~= nil then
+        for e,e1 in pairs(battleM.currentBattle.enemies) do
+            if e1.healthBar ~= nil then
+                local hpPercent = e1.health / e1.maxHealth
+                battleM:drawHealthBar(e1.healthBar, hpPercent)
             end
         end
     end
@@ -182,6 +216,14 @@ function battleM:startBattle(party,enemies)
 end
 
 function battleM:playerPhase()
+    for f,f1 in pairs(playerM.currentParty) do
+        util.tween:tweenProperty(f1.healthBar, "offsetX", -200, 0.7, "HealthBarX"..f, "out")
+    end
+
+    for e,e1 in pairs(battleM.currentBattle.enemies) do
+        util.tween:tweenProperty(e1.healthBar, "offsetX", 0, 0.7, "EnemyHealthBarX"..e, "out")
+    end
+
     playerM.player.x = battleM.currentBattle.playerReturn.x
     playerM.player.y = battleM.currentBattle.playerReturn.y
 
@@ -209,11 +251,11 @@ function battleM:playerPhase()
 
     battleM.currentBattle.phase = "player"
     if battleM.currentBattle.playerCam == nil then
-        util.tween:tweenProperty(cam, "x", battleM.currentBattle.camTrans.x + 15, 0.8, "CamMoveX", "out")
+        util.tween:tweenProperty(cam, "x", battleM.currentBattle.camTrans.x + 45, 0.8, "CamMoveX", "out")
         util.tween:tweenProperty(cam, "y", battleM.currentBattle.camTrans.y + 40, 0.8, "CamMoveY", "out")
         util.tween:tweenProperty(cam, "zoom", 5.2, 0.8, "CamMoveZoom", "out")
 
-        battleM.currentBattle.playerCam = {x=battleM.currentBattle.camTrans.x + 15, y=battleM.currentBattle.camTrans.y + 40, zoom=5.2}
+        battleM.currentBattle.playerCam = {x=battleM.currentBattle.camTrans.x + 45, y=battleM.currentBattle.camTrans.y + 40, zoom=5.2}
     else
         util.tween:tweenProperty(cam, "x", battleM.currentBattle.playerCam.x, 0.8, "CamMoveX", "out")
         util.tween:tweenProperty(cam, "y", battleM.currentBattle.playerCam.y, 0.8, "CamMoveY", "out")
@@ -230,6 +272,14 @@ function battleM:enemyPhase()
 
     for e,e1 in pairs(battleM.currentBattle.enemies) do 
         e1:load()
+    end
+
+    for f,f1 in pairs(playerM.currentParty) do
+        util.tween:tweenProperty(f1.healthBar, "offsetX", 0, 0.7, "HealthBarX"..f, "out")
+    end
+
+    for e,e1 in pairs(battleM.currentBattle.enemies) do
+        util.tween:tweenProperty(e1.healthBar, "offsetX", 200, 0.7, "EnemyHealthBarX"..e, "out")
     end
 
     util.tween:tweenProperty(cam, "zoom", battleM.currentBattle.camTrans.zoom, 0.8, "CamMoveZoom", "out")
@@ -251,21 +301,23 @@ end
 function battleM:moveMoveButtons(idx)
     for b,b1 in ipairs(battleM.moveButtons) do
         b1.flowerIdx = idx
-        b1.sprite = util.sprites:getSprite(battleM.currentBattle.party[idx].data.v1.. "_move_button")
-        util.tween:tweenProperty(b1, "x", battleM.currentBattle.party[idx].x + 45 - ((1-(b%2)) * 12), 0.7 + ((b-1) * 0.05), "MoveButtonX"..b, "out")
-        util.tween:tweenProperty(b1, "y", battleM.currentBattle.party[idx].y - 45 + ((b-1) * 15), 0.7 + ((b-1) * 0.05), "MoveButtonY"..b, "out")
+        if battleM.currentBattle.party[idx] ~= nil then
+            b1.sprite = util.sprites:getSprite(battleM.currentBattle.party[idx].data.v1.. "_move_button")
+            util.tween:tweenProperty(b1, "x", battleM.currentBattle.party[idx].x + 45 - ((1-(b%2)) * 12), 0.7 + ((b-1) * 0.05), "MoveButtonX"..b, "out")
+            util.tween:tweenProperty(b1, "y", battleM.currentBattle.party[idx].y - 45 + ((b-1) * 15), 0.7 + ((b-1) * 0.05), "MoveButtonY"..b, "out")
 
-        util.tween:tweenProperty(b1.label, "x", battleM.currentBattle.party[idx].x + 45 - ((1-(b%2)) * 12), 0.7 + ((b-1) * 0.05), "MoveButtonTextX"..b, "out")
-        util.tween:tweenProperty(b1.label, "y", battleM.currentBattle.party[idx].y - 45 + ((b-1) * 15), 0.7 + ((b-1) * 0.05), "MoveButtoTextY"..b, "out")
+            util.tween:tweenProperty(b1.label, "x", battleM.currentBattle.party[idx].x + 45 - ((1-(b%2)) * 12), 0.7 + ((b-1) * 0.05), "MoveButtonTextX"..b, "out")
+            util.tween:tweenProperty(b1.label, "y", battleM.currentBattle.party[idx].y - 45 + ((b-1) * 15), 0.7 + ((b-1) * 0.05), "MoveButtoTextY"..b, "out")
 
-        if b == 2 and battleM.currentBattle.party[b1.flowerIdx].data.v3 == nil then break end
+            if b == 2 and battleM.currentBattle.party[b1.flowerIdx].data.v3 == nil then break end
 
-        if battleM.currentBattle.party[b1.flowerIdx].data.moveSet[b] ~= nil then
-            b1.sprite = util.sprites:getSprite(battleM.currentBattle.party[b1.flowerIdx].data.moveSet[b].type.. "_move_button")
+            if battleM.currentBattle.party[b1.flowerIdx].data.moveSet[b] ~= nil then
+                b1.sprite = util.sprites:getSprite(battleM.currentBattle.party[b1.flowerIdx].data.moveSet[b].type.. "_move_button")
+                    
+                b1.label.changePallet(util.sprites.pallets[battleM.currentBattle.party[b1.flowerIdx].data.moveSet[b].type])
+                b1.label.changeText(battleM.currentBattle.party[b1.flowerIdx].data.moveSet[b].name)
                 
-            b1.label.changePallet(util.sprites.pallets[battleM.currentBattle.party[b1.flowerIdx].data.moveSet[b].type])
-            b1.label.changeText(battleM.currentBattle.party[b1.flowerIdx].data.moveSet[b].name)
-            
+            end
         end
     end
 end
@@ -327,6 +379,9 @@ battleM.moveSetValues = {
 function battleM:addMoveSet(flower)
     local moveSet = {}
 
+    flower.health = 100
+    flower.maxHealth = 100
+
 
     if flower.data.v1 ~= nil then
         local typeV = flower.data.v1
@@ -371,6 +426,31 @@ function battleM:addMoveSet(flower)
     
     flower.data.moveSet = {}
     flower.data.moveSet = moveSet
+end
+
+function battleM:drawHealthBar(bar, percent)
+    local w = bar.fullSprite:getWidth()
+    local h = bar.fullSprite:getHeight()
+
+    bar.sprite = bar.emptySprite
+    util.sprites:drawObject(bar)
+
+    love.graphics.stencil(function()
+        love.graphics.rectangle(
+            "fill",
+            bar.x + bar.offsetX - w/2,
+            bar.y - h/2,
+            w * percent,
+            h
+        )
+    end, "replace", 1)
+
+    love.graphics.setStencilTest("greater", 0)
+
+    bar.sprite = bar.fullSprite
+    util.sprites:drawObject(bar)
+
+    love.graphics.setStencilTest()
 end
 
 return battleM

@@ -17,6 +17,10 @@ local layerColors = {
 
 
 function intermission:load()
+    
+end
+
+function intermission:createPanel()
     intermission:generateInfernoOrder()
     intermission:registerPallets()
 
@@ -24,7 +28,7 @@ function intermission:load()
     for l,l1 in pairs(intermission.chosenOrder) do
         print(l1, "Layer ".. l)
     end
-
+    infernoIntermission.panel = nil
     intermission.panel = {
         x = 0,
         y = 0,

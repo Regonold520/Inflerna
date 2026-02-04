@@ -27,7 +27,8 @@ end
 function time:runDeferred(seconds,func)
     local newCall = {
         endTime = time.elapsedTime + seconds,
-        call = func
+        call = func,
+        sceneBegun = sceneM.activeScene
     }
 
     table.insert(time.cachedCalls, newCall)

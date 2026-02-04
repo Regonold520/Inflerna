@@ -17,6 +17,10 @@ crawler.deletionTweens = {}
 
 function crawler:load()
     util.time:runDeferred(2, function() self:jump() end)
+
+    self.hitboxEnter = function()
+        enemyM:hurtFlower(love.math.random(1,#battleM.currentBattle.party), 40)
+    end
 end
 
 function crawler:jump()
@@ -31,10 +35,10 @@ function crawler:jump()
 
     enemyM:protectedTween(self, "x", self.x - (xOffset * 10), 0.5, "CrawlerMoveX", "out")
     enemyM:protectedTween(self, "y", self.y - (yOffset * 10), 0.5, "CrawlerMoveY", "out")
-
-    util.time:runDeferred(0.5 ,  function() enemyM:protectedTween(self, "x", clamp(battleM.currentBattle.playerReturn.x - 10, self.x + (xOffset * mult), battleM.currentBattle.playerReturn.x + 230), 1.7, "CrawlerMoveX", "out") end)
-    util.time:runDeferred(0.5 ,  function() enemyM:protectedTween(self, "y", clamp(battleM.currentBattle.playerReturn.y - 16, self.y + (yOffset * mult), battleM.currentBattle.playerReturn.y + 34), 1.7, "CrawlerMoveY", "out") end)
-
+    if battleM.currentBattle ~= nil then
+        util.time:runDeferred(0.5 ,  function() enemyM:protectedTween(self, "x", clamp(battleM.currentBattle.playerReturn.x - 10, self.x + (xOffset * mult), battleM.currentBattle.playerReturn.x + 230), 1.7, "CrawlerMoveX", "out") end)
+        util.time:runDeferred(0.5 ,  function() enemyM:protectedTween(self, "y", clamp(battleM.currentBattle.playerReturn.y - 16, self.y + (yOffset * mult), battleM.currentBattle.playerReturn.y + 34), 1.7, "CrawlerMoveY", "out") end)
+    end
     
     
 
