@@ -26,14 +26,14 @@ function hitbox:update(dt)
                     if h1.overlappingBodies[h2.pV] == nil then
                         h1.overlappingBodies[h2.pV] = h2
                         if h1.object.hitboxEnter ~= nil then
-                            h1.object:hitboxEnter()
+                            h1.object.hitboxEnter(h2)
                         end
                     end
                 else
                     if h1.overlappingBodies[h2.pV] ~= nil then
                         h1.overlappingBodies[h2.pV] = nil
                         if h1.object.hitboxExit ~= nil then
-                            h1.object:hitboxExit()
+                            h1.object.hitboxExit(h2)
                         end
                     end
                 end
@@ -71,7 +71,8 @@ function hitbox:createHitbox(object, id, scaleX, scaleY, offsetX, offsetY)
         offsetX = offsetX,
         offsetY = offsetY,
         overlappingBodies = {},
-        pV = love.math.random(1,100000)
+        pV = love.math.random(1,100000),
+        sceneBegun = sceneM.activeScene
     }
 
     object.hitbox = newHitbox

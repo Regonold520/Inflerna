@@ -130,7 +130,7 @@ function battleM:genMoveButtons()
                             if battleM.currentBattle ~= nil then
                                 battleM.currentBattle.enemies[1].hit(battleM.currentBattle.party[moveButton.flowerIdx].data.moveSet[moveButton.buttonID].damage,
                                     battleM.currentBattle.party[moveButton.flowerIdx].data.moveSet[moveButton.buttonID].pierce)
-                            if battleM.currentBattle.enemies[1] ~= nil then
+                            if #battleM.currentBattle.enemies > 0 then
                                     util.tween:tweenProperty(cam, "x", battleM.currentBattle.playerCam.x, 0.5, "CamMoveX", "out")
                                     util.tween:tweenProperty(cam, "zoom", battleM.currentBattle.playerCam.zoom, 0.5, "CamMoveZoom", "out")
                                     
@@ -140,7 +140,7 @@ function battleM:genMoveButtons()
                         end)
 
                         util.time:runDeferred(0.7, function()
-                            if battleM.currentBattle.enemies[1] ~= nil then
+                            if #battleM.currentBattle.enemies > 0 then
                                 if battleM.currentBattle.party[moveButton.flowerIdx].data.moveSet[moveButton.buttonID] ~= nil then
                                     if moveButton.flowerIdx < #battleM.currentBattle.party then
                                         battleM:moveMoveButtons(moveButton.flowerIdx + 1)
@@ -164,27 +164,67 @@ end
 
 function battleM:resetAfterKill(enemy)
     if battleM.currentBattle == nil then return end
-    battleM.currentBattle.bulletAnim = true
-    battleM.currentBattle.enemies[1] = nil
 
-    battleM.bullets = {}
-    util.tween.activeTweens["CamMoveX"] = nil
-    util.tween.activeTweens["CamMoveY"] = nil
-    util.tween.activeTweens["CamMoveZoom"] = nil
-    util.tween.activeTweens["CamMoveRot"] = nil
+    local lastEnemyX = battleM.currentBattle.enemies[1].x
+    
+    table.remove(battleM.currentBattle.enemies, 1)
 
-    util.tween:tweenProperty(cam, "x", battleM.currentBattle.camTrans.x, 1, "CamResetX", "out")
-    util.tween:tweenProperty(cam, "y", battleM.currentBattle.camTrans.y, 1, "CamReseteY", "out")
-    util.tween:tweenProperty(cam, "zoom",  battleM.currentBattle.camTrans.zoom, 1, "CamResetZoom", "out")
-    util.tween:tweenProperty(cam, "rot", 0, 1, "CamResetRot", "out")
+    if #battleM.currentBattle.enemies <= 0 then
+        battleM.currentBattle.bulletAnim = true
+        util.tween.activeTweens["CamMoveX"] = nil
+        util.tween.activeTweens["CamMoveY"] = nil
+        util.tween.activeTweens["CamMoveZoom"] = nil
+        util.tween.activeTweens["CamMoveRot"] = nil
 
-    for b,b1 in pairs(battleM.moveButtons) do
-        util.tween:tweenProperty(b1, "x",  playerM.player.x - 150, 0.7, "MoveButtonX"..b, "out")
-        util.tween:tweenProperty(b1.label, "x",  playerM.player.x - 150, 0.7, "MoveButtonTextX"..b, "out")
+        util.tween:tweenProperty(cam, "x", battleM.currentBattle.camTrans.x, 1, "CamResetX", "out")
+        util.tween:tweenProperty(cam, "y", battleM.currentBattle.camTrans.y, 1, "CamReseteY", "out")
+        util.tween:tweenProperty(cam, "zoom",  battleM.currentBattle.camTrans.zoom, 1, "CamResetZoom", "out")
+        util.tween:tweenProperty(cam, "rot", 0, 1, "CamResetRot", "out")
+
+        for b,b1 in pairs(battleM.moveButtons) do
+            util.tween:tweenProperty(b1, "x",  playerM.player.x - 150, 0.7, "MoveButtonX"..b, "out")
+            util.tween:tweenProperty(b1.label, "x",  playerM.player.x - 150, 0.7, "MoveButtonTextX"..b, "out")
+        end
+
+        infernoM.currentLayer.battlesWon = infernoM.currentLayer.battlesWon + 1
+
+        util.time:runDeferred(1, function() enemyM:randomLayerSpawn(1, 4, lastEnemyX + 200) end)
+    else
+        battleM:repositionEnemies(lastEnemyX)
+        battleM.currentBattle.bulletAnim = false
     end
 
-    util.time:runDeferred(1, function() enemyM:spawnEnemy("crawler", "limbo", enemy.x + 200) end)
+end
 
+function battleM:repositionEnemies(eX)
+    if not battleM.currentBattle then return end
+    local enemies = battleM.currentBattle.enemies
+    local total = #enemies
+    if total == 0 then return end
+
+    local rows = 2
+    local spacingX = 50
+    local spacingY = 30
+    local baseX = eX 
+    local baseY = 80 
+
+    for i, enemy in ipairs(enemies) do
+        local col = math.floor((i-1) / rows)
+        local row = (i-1) % rows
+
+        local xPos = baseX + col * spacingX
+        local yPos = baseY + row * spacingY
+
+        util.tween:tweenProperty(enemy, "x", xPos, 0.5, "EnemyPosX"..i, "out")
+        util.tween:tweenProperty(enemy, "y", yPos, 0.5, "EnemyPosY"..i, "out")
+
+        if enemy.healthBar then
+            util.tween:tweenProperty(enemy.healthBar, "x", xPos, 0.5, "EnemyHPX"..i, "out")
+            util.tween:tweenProperty(enemy.healthBar, "y", yPos - 33, 0.5, "EnemyHPY"..i, "out")
+        end
+
+        battleM.currentBattle.enemyReturns[i] = {x = xPos, y = yPos}
+    end
 end
 
 

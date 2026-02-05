@@ -12,7 +12,7 @@ function layerV:load()
         {sprite=util.sprites:getSprite("limbo_bg_focal"), x=0, y=-10}
     }, {
         {sprite=util.sprites:getSprite("limbo_bg_floor"), x=0, y=0}
-    })
+    }, {"crawler"})
 end
 
 function layerV:update(dt)
@@ -148,14 +148,16 @@ function layerV:generateChunk(idx)
     infernoM.generatedChunks[idx] = newChunk
 end
 
-function layerV:registerLayer(id, bgColour, foregroundAssets, midgroundAssets, focalPoint, bgFloor)
+function layerV:registerLayer(id, bgColour, foregroundAssets, midgroundAssets, focalPoint, bgFloor, enemyPool)
     local layerEntry = {
         bgColour = bgColour,
         floorSprite = util.sprites:getSprite(id.. "_floor"),
         foregroundAssets = foregroundAssets,
         midgroundAssets = midgroundAssets,
         focalPoint = focalPoint,
-        bgFloor = bgFloor
+        bgFloor = bgFloor,
+        enemyPool = enemyPool,
+        id = id
     }
 
     infernoM.layers[id] = layerEntry

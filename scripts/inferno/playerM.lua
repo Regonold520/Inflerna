@@ -46,7 +46,7 @@ function playerM:proceedForward(xAmount)
     end
 
     
-    util.time:runDeferred(time + 0.15, function() battleM:startBattle(playerM.currentParty,{enemyM.enemies[1]}) end)
+    util.time:runDeferred(time + 0.15, function() battleM:startBattle(playerM.currentParty,enemyM.enemies) end)
 end
 
 return playerM

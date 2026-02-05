@@ -66,8 +66,6 @@ function infernoM:loadScene()
     infernoM.currentChunk = 0
     infernoM.currentLayer = nil
 
-    playerM:makePlayer()
-
     for id, tw in pairs(util.tween.activeTweens) do
         if tw.sceneBegun == "inferno" then
             util.tween.activeTweens[id] = nil
@@ -81,6 +79,13 @@ function infernoM:loadScene()
         end
     end
 
+    for id, hb in pairs(util.hitbox.hitboxes) do
+        if hb.sceneBegun == "inferno" then
+            util.hitbox.hitboxes[id] = nil
+        end
+    end
+
+    playerM:makePlayer()
 
     infernoIntermission:createPanel()
     
@@ -140,7 +145,7 @@ function infernoM:loadScene()
     util.time:runDeferred(1, function() util.tween:tweenProperty(cam, "y", 0, 2, "CamMoveY", "out") end)
     util.time:runDeferred(1.2, function() util.tween:tweenProperty(playerM.player, "y", 90, 1.5, "PlayerMoveY", "in") end)
     util.time:runDeferred(1, function() util.tween:tweenProperty(infernoIntermission.panel, "y", -250, 2, "IntermissionMoveY", "out") end)
-    util.time:runDeferred(5, function() enemyM:spawnEnemy("crawler", "limbo", 200) end)
+    util.time:runDeferred(5, function() enemyM:randomLayerSpawn(1, 4, 300) end)
 end
 
 function infernoM:layerLoaded()
@@ -151,6 +156,7 @@ end
 
 function infernoM:loadLayer(layerID) 
     infernoM.currentLayer = infernoM.layers[layerID]
+    infernoM.currentLayer.battlesWon = 0
     love.graphics.setBackgroundColor(infernoM.currentLayer.bgColour.r,infernoM.currentLayer.bgColour.g,infernoM.currentLayer.bgColour.b)
     infernoM:layerLoaded()
 end
