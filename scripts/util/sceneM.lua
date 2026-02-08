@@ -33,7 +33,7 @@ function sceneM:load()
 
         cam.roomPos = 0
     end
-    util.time:runDeferred(0.5, function() sceneM:switchScene("inferno") end)
+    util.time:runDeferred(0.5, function() sceneM:switchScene("garden") end)
     
 end
 

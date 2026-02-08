@@ -12,9 +12,12 @@ function text:load()
     }, "text") 
 end
 
-function text:createText(id, string, pallet, boundX)
+-- Added alignLeft and wrapText parameters
+function text:createText(id, string, pallet, boundX, alignLeft, wrapText)
     pallet = pallet or util.sprites.pallets.text
     boundX = boundX or 0
+    alignLeft = alignLeft or false
+    wrapText = wrapText or false
 
     local newFont = love.graphics.newImageFont(
         util.sprites:palletSwapPath("assets/testFont.png", util.sprites.pallets.text, pallet),
@@ -23,8 +26,8 @@ function text:createText(id, string, pallet, boundX)
         "123456789.,!?-+/():;%&`'*#=[]\""
     )
 
-    local newTxt = love.graphics.newText(newFont, string)
-
+    local newTxt = love.graphics.newText(newFont, "")
+    
     local newText = {
         x = 0,
         y = 0,
@@ -35,43 +38,59 @@ function text:createText(id, string, pallet, boundX)
         textInstance = newTxt,
         rawText = string,
         boundX = boundX,
-        originX = newTxt:getWidth() / 2,
-        originY = newTxt:getHeight() / 2
+        alignLeft = alignLeft,
+        wrapText = wrapText,
+        originX = 0,
+        originY = 0
     }
 
+    -- Helper to handle internal text setup (wrapping vs scaling)
+    newText.refreshText = function()
+        if newText.wrapText and newText.boundX > 0 then
+            newText.textInstance:setf(newText.rawText, newText.boundX, "left")
+        else
+            newText.textInstance:set(newText.rawText)
+        end
+        
+        -- originX: 0 for left-aligned, half-width for centered
+        newText.originX = newText.alignLeft and 0 or (newText.textInstance:getWidth() / 2)
+        
+        -- originY: 0 pins the TOP of the text to newText.y
+        -- This ensures wrapping only expands the text downwards.
+        newText.originY = 0 
+    end
+
     newText.updateScale = function()
-        if newText.boundX > 0 then
+        newText.fitScale = 1 -- Default to no scaling
+        
+        -- Only calculate a shrink-to-fit scale if NOT wrapping and boundX is set
+        if not newText.wrapText and newText.boundX > 0 then
             local width = newText.textInstance:getWidth()
             if width > newText.boundX then
-                local scaleFactor = newText.boundX / width
-                newText.scaleX = math.min(scaleFactor, newText.baseScale)
-                newText.scaleY = math.min(scaleFactor, newText.baseScale)
-            else
-                newText.scaleX = math.min(newText.scaleX, newText.baseScale)
-                newText.scaleY = math.min(newText.scaleY, newText.baseScale)
+                newText.fitScale = newText.boundX / width
             end
         end
     end
 
     newText.draw = function()
         newText:updateScale()
+        
+        -- We multiply your external scaleX/Y by the internal fitScale
         love.graphics.draw(
             newText.textInstance,
             newText.x,
             newText.y,
             0,
-            newText.scaleX,
-            newText.scaleY,
+            newText.scaleX * newText.fitScale, 
+            newText.scaleY * newText.fitScale,
             newText.originX,
             newText.originY
         )
     end
 
     newText.changeText = function(newStr)
-        newText.textInstance:set(newStr)
         newText.rawText = newStr
-        newText.originX = newText.textInstance:getWidth() / 2
-        newText.originY = newText.textInstance:getHeight() / 2
+        newText:refreshText()
     end
 
     newText.changePallet = function(newPallet)
@@ -82,11 +101,13 @@ function text:createText(id, string, pallet, boundX)
             "123456789.,!?-+/():;%&`'*#=[]\""
         )
         newText.fontInstance = newFont2
-        newText.textInstance = love.graphics.newText(newFont2, newText.rawText)
-        newText.originX = newText.textInstance:getWidth() / 2
-        newText.originY = newText.textInstance:getHeight() / 2
+        newText.textInstance = love.graphics.newText(newFont2, "")
+        newText:refreshText()
     end
 
+    -- Initial setup
+    newText:refreshText()
+    
     text.textObjects[id] = newText
     return newText
 end

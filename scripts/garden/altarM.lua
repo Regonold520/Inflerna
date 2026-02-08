@@ -21,6 +21,11 @@ function altarM:load()
 
     altarM.altar.onClick = function()
         if altarM.altarGuiEnabled == false and altarM.occupiedSeed == nil then
+            if util.dialogue.tutorial.fullyComplete == false and util.dialogue.tutorial.altarExplain == false then
+                util.dialogue.tutorial.altarExplain = true
+                util.time:runDeferred(0.1, function()util.dialogue:initiateDialogue("virgil", "altarExplain")end)
+            end
+
             util.tween:tweenProperty(altarM,"vignetteZoomMult" , 1.1, 1, "vignetteZoom", "out")
             util.tween:tweenProperty(altarM,"slotsZoomMult" , 1.1, 1, "slotsZoom", "out")
             util.tween:tweenProperty(cam,"zoomModifier" , 1.2, 1, "altarZoomIn", "out")
@@ -52,6 +57,11 @@ function altarM:load()
 
     altarM.confirmButton.onClick = function()
         if altarM.occupiedSeed == nil and altarM.altarGuiEnabled and altarM.slots.primary.virtue ~= nil then
+            if util.dialogue.tutorial.fullyComplete == false and util.dialogue.tutorial.seedCreated == false then
+                util.dialogue.tutorial.seedCreated = true
+                util.time:runDeferred(0.1, function()util.dialogue:initiateDialogue("virgil", "seedCreated")end)
+            end
+
             local newV2 = altarM.slots.secondary.virtue or altarM.slots.primary.virtue
             local newV3 = altarM.slots.tertiary.virtue or altarM.slots.primary.virtue
 
@@ -132,6 +142,12 @@ function altarM:populateVirtueButtons()
         }
         
         newV.onClick = function()
+            if util.dialogue.tutorial.fullyComplete == false and util.dialogue.tutorial.altarSelect == false then
+                util.dialogue.tutorial.altarSelect = true
+                util.time:runDeferred(0.1, function()util.dialogue:initiateDialogue("virgil", "altarSelect")end)
+            end
+
+
             local removed = false
             for slotName, slot in pairs(altarM.slots) do
                 if slot.virtue == v1 then

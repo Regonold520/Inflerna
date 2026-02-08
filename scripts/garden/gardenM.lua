@@ -21,17 +21,22 @@ function gardenM:load()
     util.input:addClickable(gardenM.wateringCan,"garden")
 end
 
+gardenM.mX = 0
+gardenM.mY = 0
+
 function gardenM:update(dt)
 
-    local mX = 0
-    local mY = 0
+    
     if gardenM.cameraStatic == false then
-        mX = ((love.mouse.getX() - love.graphics:getWidth() / 2)/40)
-        mY = ((love.mouse.getY() - love.graphics:getHeight() / 2)/40)
+        gardenM.mX = ((love.mouse.getX() - love.graphics:getWidth() / 2)/40)
+        gardenM.mY = ((love.mouse.getY() - love.graphics:getHeight() / 2)/40)
+    elseif gardenM.mX ~= 0 or gardenM.mY ~= 0 then
+        util.tween:tweenProperty(gardenM, "mX", 0, 0.5, "GardenMX", "out")
+        util.tween:tweenProperty(gardenM, "mY", 0, 0.5, "GardenMY", "out")
     end
 
-    cam.x = clamp(-390, mX + cam.projX, 390)
-    cam.y = -10 + mY  + cam.yAddition
+    cam.x = clamp(-390, gardenM.mX + cam.projX, 390)
+    cam.y = -10 + gardenM.mY  + cam.yAddition
 
 end
 
@@ -62,6 +67,13 @@ function gardenM:keypressed(key, scancode, isrepeat)
         if key == "a" and cam.roomPos - 1 > -2 then
             cam.roomPos = cam.roomPos - 1
             util.tween:tweenProperty(cam,"projX" , 390 * cam.roomPos, 2, "camTweenX", "out")
+        end
+    end
+
+    if cam.roomPos == 1 then
+        if util.dialogue.tutorial.fullyComplete == false and util.dialogue.tutorial.altarEnter == false then
+            util.dialogue.tutorial.altarEnter = true
+            util.time:runDeferred(0.5, function() util.dialogue:initiateDialogue("virgil", "altarEnter") end )
         end
     end
 end

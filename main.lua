@@ -19,6 +19,9 @@ util.time = require("scripts/util/time")
 util.input = require("scripts/util/input")
 util.text = require("scripts/util/text")
 util.hitbox = require("scripts/util/hitbox")
+util.dialogue = require("scripts/util/dialogue")
+
+lang = require("localization/en_us")
 
 cam = {
     x = 0,
@@ -49,6 +52,7 @@ function love.load()
     util.time:load()
     util.text:load()
     util.hitbox:load()
+    util.dialogue:load()
     sceneM:load()
 
 
@@ -58,6 +62,7 @@ function love.load()
             if f1.load ~= nil then f1:load() end
         end
     end
+
 end
 
 function love.update(dt)
@@ -69,6 +74,7 @@ function love.update(dt)
 
     util.input:cleanup(dt)
     util.hitbox:update(dt)
+    util.dialogue:update(dt)
 
     if util.input.mousejustpressed then
         util.input.mousejustpressed = false
@@ -134,6 +140,7 @@ function love.draw()
     sceneM:draw()
     util.input:draw()
     util.hitbox:draw()
+    util.dialogue:draw()
 end
 
 function love.mousepressed(x, y, button, istouch)

@@ -10,6 +10,8 @@ function input:loopClickers()
     if sceneM.scenes[sceneM.activeScene] ~= nil then
         for c,c1 in pairs(sceneM.scenes[sceneM.activeScene].inputObjects) do
 
+            if c1.active == false then goto continue end
+
             if c1.dead ~= nil then
                 if c1.dead then
                     goto continue
@@ -19,6 +21,7 @@ function input:loopClickers()
             if not c1.sprite then
                 goto continue
             end
+            
 
 
             local mX, mY = getWorldMouse()
