@@ -79,6 +79,7 @@ function altarM:load()
             altarM.occupiedSeed = blessedSeed
 
             blessedSeed.onClick = function()
+                util.dialogue.tutorial.seedTransported = true
                 if altarM.occupiedSeed == nil then
                     return
                 end

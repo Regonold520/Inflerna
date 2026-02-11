@@ -25,10 +25,12 @@ function input:loopClickers()
 
 
             local mX, mY = getWorldMouse()
+            local scaleX = c1.scaleX or 1
+            local scaleY = c1.scaleY or 1
             if c1.isUi then
                 mX, mY = love.mouse.getPosition()
-                local halfW = (c1.sprite:getWidth() * cam.zoom) / 2
-                local halfH = (c1.sprite:getHeight() * cam.zoom) / 2
+                local halfW = (c1.sprite:getWidth() * cam.zoom * scaleX) / 2
+                local halfH = (c1.sprite:getHeight() * cam.zoom * scaleY) / 2
 
                 
 
@@ -41,8 +43,8 @@ function input:loopClickers()
                 end
 
             else
-                if mX > c1.x - c1.sprite:getWidth()/2 and mX < c1.x + c1.sprite:getWidth()/2 then
-                    if mY > c1.y - c1.sprite:getHeight()/2 and mY < c1.y + c1.sprite:getHeight()/2 then
+                if mX > c1.x - (c1.sprite:getWidth()/2* scaleX) and mX < c1.x + (c1.sprite:getWidth()/2* scaleX) then
+                    if mY > c1.y -( c1.sprite:getHeight()/2* scaleY) and mY < c1.y + (c1.sprite:getHeight()/2* scaleY) then
                         if c1.onClick ~= nil then
                             table.insert(collectedLads, c1)
                         end
@@ -116,6 +118,8 @@ function input:draw()
         end)
 
         for c,c1 in pairs(clickers) do
+            local scaleX = c1.scaleX or 1
+            local scaleY = c1.scaleY or 1
             love.graphics.setColor(input.layerColours[c1.layer+10].r,input.layerColours[c1.layer+10].g,input.layerColours[c1.layer+10].b,1)
             if c1.isUi == false then
                 love.graphics.setLineWidth(1)
@@ -124,7 +128,7 @@ function input:draw()
                 cam:detach()
             else
                 love.graphics.setLineWidth(4)
-                love.graphics.rectangle("line",c1.x - c1.sprite:getWidth()/2*cam.zoom,c1.y - c1.sprite:getHeight()/2*cam.zoom,c1.sprite:getWidth()*cam.zoom,c1.sprite:getHeight()*cam.zoom)
+                love.graphics.rectangle("line",c1.x - (c1.sprite:getWidth()/2* scaleX)*cam.zoom,c1.y - c1.sprite:getHeight()/2*cam.zoom,(c1.sprite:getWidth()* scaleX)*cam.zoom,c1.sprite:getHeight()*cam.zoom)
             end
             
         end

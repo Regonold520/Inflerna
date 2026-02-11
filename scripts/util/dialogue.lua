@@ -4,12 +4,18 @@ dialogue.dialogues = {}
 dialogue.currentActor = nil
 
 dialogue.tutorial = {
-    fullyComplete = false,
+    fullyComplete = true,
     enter = false,
     altarEnter = false,
     altarExplain = false,
     altarSelect = false,
-    seedCreated = false
+    seedCreated = false,
+    seedTransported = false,
+    returnToGarden = false,
+    afterPlant = false,
+    flowerBloomed = false,
+    doorwayEnter = false,
+    doorwaySelect = false
 }
 
 function dialogue:load()
@@ -102,6 +108,7 @@ function dialogue:obscure()
 end
 
 function dialogue:writeLine(lineIDX)
+    dialogue.currentActor.skipping = false
     dialogue.currentActor.currentLine = lineIDX
     local line = dialogue.currentActor.lines[lineIDX].text
     local total = ""
@@ -113,14 +120,17 @@ function dialogue:writeLine(lineIDX)
     for i=1,#line do
         util.time:runDeferred(i / 15,
             function() 
-                total = total.. string.sub(line, i, i)
-                dialogue.currentActor.txt.changeText(total)
-                if i == #line then dialogue.currentActor.progressable = true end
+                if dialogue.currentActor.skipping == false and dialogue.currentActor.currentLine == lineIDX then
+                    total = total.. string.sub(line, i, i)
+                    dialogue.currentActor.txt.changeText(total)
+                    if i == #line then dialogue.currentActor.progressable = true end
+                end
         end)
     end
 end
 
 function dialogue:initiateDialogue(character, dialogueID)
+    local origCam = gardenM.cameraStatic
     gardenM.cameraStatic = true
 
     local lines = dialogue.dialogues[character][dialogueID]
@@ -142,7 +152,9 @@ function dialogue:initiateDialogue(character, dialogueID)
         txt = txt,
         nameTxt = nameTxt,
         charName = dialogue.dialogues[character].displayName,
-        progressable = false
+        progressable = false,
+        skipping = false,
+        origCam = origCam
     }
 
     newActor.progressActor = {
@@ -163,6 +175,13 @@ function dialogue:initiateDialogue(character, dialogueID)
                 dialogue:closeDialogue()
                 newActor.progressActor.active = false
             end
+        else
+            if newActor.skipping == false then
+                newActor.skipping = true
+                local line = newActor.lines[newActor.currentLine].text
+                newActor.txt.changeText(line)
+                newActor.progressable = true
+            end
         end
     end
 
@@ -181,7 +200,7 @@ function dialogue:initiateDialogue(character, dialogueID)
 end
 
 function dialogue:closeDialogue()
-    gardenM.cameraStatic = false
+    gardenM.cameraStatic = dialogue.currentActor.origCam
 
     util.tween:tweenProperty(dialogue.currentActor, "y", love.graphics:getHeight(), 0.5, "DialogueY", "out")
     util.tween:tweenProperty(dialogue.currentActor, "rectOpacity", 0, 0.5, "DialogueOpacity", "out")

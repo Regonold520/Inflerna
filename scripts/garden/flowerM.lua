@@ -53,6 +53,11 @@ function flowerM:update(dt)
         if i.growth > 50 and not i.hasBloomed then
             i.hasBloomed = true
 
+            if util.dialogue.tutorial.fullyComplete == false and util.dialogue.tutorial.flowerBloomed == false then
+                util.dialogue.tutorial.flowerBloomed = true
+                util.dialogue:initiateDialogue("virgil", "flowerBloomed")
+            end
+
             local faces = {i.data.v1, i.data.v2}
             i.sprites = {
                 head = util.sprites:getSprite("head-".. i.data.v1),
@@ -533,7 +538,7 @@ end
 
 function flowerM:createPot()
     local newPot = {
-        flower = nil,
+        flower = flowerM:generateRandomFlower(),
         sprite = util.sprites:getSprite("pot"),
         x = 0,
         y = 0,
@@ -550,10 +555,17 @@ function flowerM:createPot()
             elseif f.growthStage == "stem" and f.growth >= 50 then
                 f.growthStage = "bloom"
             end
+        elseif newPot.flower ~= nil then
+            minigameM:startMinigame("fertiliser", newPot)
         end
 
 
         if newPot.scheduledSeed ~= nil then
+            if util.dialogue.tutorial.fullyComplete == false and util.dialogue.tutorial.afterPlant == false then
+                util.dialogue.tutorial.afterPlant = true
+                util.dialogue:initiateDialogue("virgil", "afterPlant")
+            end
+
             local x1 = newPot.scheduledSeed.data.v1 
             local y1 = newPot.scheduledSeed.data.v2 or newPot.scheduledSeed.data.v1
             local z1 = newPot.scheduledSeed.data.v3 or newPot.scheduledSeed.data.v1
@@ -597,49 +609,21 @@ function flowerM:createPot()
 end
 
 function flowerM:generateRandomFlower()
-    local f = flowerM:generateFlower({
-        v1 = flowerM.virtues[love.math.random(#flowerM.virtues)],
-        v2 = flowerM.virtues[love.math.random(#flowerM.virtues)],
-        v3 = flowerM.virtues[love.math.random(#flowerM.virtues)],
-        virtueList = {},
+    local x1 = flowerM.virtues[ math.random( #flowerM.virtues ) ]
+    local y1 = flowerM.virtues[ math.random( #flowerM.virtues ) ]
+    local z1 = flowerM.virtues[ math.random( #flowerM.virtues ) ]
+    local flowerData = {
+        v1 = x1,
+        v2 = y1,
+        v3 = z1,
+        virtueList = {x1,y1,z1},
         chosenColour = nil
-    })
-
-    f.data.virtueList = {f.data.v1, f.data.v2, f.data.v3}
-    f.data.chosenColour = f.data.virtueList[love.math.random(#f.data.virtueList)]
-
-    f.growthStage, f.growth, f.hasBloomed = "bloom", 100, true
-
-    local faces = {f.data.v1, f.data.v2}
-    f.sprites = {
-        head = util.sprites:getSprite("head-" .. f.data.v1),
-        stem = util.sprites:getSprite("stem-" .. (f.data.v2 or f.data.v1)),
-        face = util.sprites:getSprite("face-" .. faces[math.random(#faces)]),
-        sideBulb = util.sprites:getSprite("side_bulb"),
-        bulb = util.sprites:getSprite("bulb")
     }
 
-    f.sprites.head = util.sprites:palletSwap(f.sprites.head, util.sprites.pallets.flowergray, util.sprites.pallets[f.data.chosenColour])
-    local colour = f.data.v3 or f.data.v1
-    f.sprites.sideBulb = util.sprites:palletSwap(f.sprites.sideBulb, util.sprites.pallets.flowergray, util.sprites.pallets[colour])
-    f.sprites.face = util.sprites:palletSwap(f.sprites.face, util.sprites.pallets.flowergray, util.sprites.pallets[f.data.chosenColour])
+    flowerData.chosenColour = flowerM.virtues[ math.random( #flowerM.virtues ) ]
 
-    local stemKey = f.data.v2 or f.data.v1
-    if flowerM.stemData[stemKey] ~= nil then
-        local faceTrans = flowerM.faceTranslations[f.data.v1] or { translation = { x = 0, y = 0 } }
-
-        f.translation = {
-            stem = {
-                x = flowerM.stemData[stemKey].translation.x,
-                y = flowerM.stemData[stemKey].translation.y
-            },
-            face = {
-                x = faceTrans.translation.x,
-                y = faceTrans.translation.y
-            }
-        }
-    end
-    return f
+    local newFlower = flowerM:generateFlower(flowerData)
+    return newFlower
 end
 
 return flowerM

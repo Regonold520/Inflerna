@@ -27,7 +27,7 @@ function doorwayM:load()
                 util.tween:tweenProperty(altarM,"vignetteZoomMult" , 1.1, 1, "vignetteZoom", "out")
                 util.tween:tweenProperty(cam,"zoomModifier" , 1.15, 1, "altarZoomIn", "out")
                 util.tween:tweenProperty(cam,"yAddition" , -10,1.5, "altarRiseUp", "out")
-                util.tween:tweenProperty(doorwayM.exitPanel,"yMove" , 0,1, "exitPanelYmove", "out")
+                util.tween:tweenProperty(doorwayM.exitPanel,"yMove" , 100,1, "exitPanelYmove", "out")
                 doorwayM.exitPanel.page = 1
 
                 gardenM.cameraStatic = true
@@ -48,7 +48,7 @@ function doorwayM:load()
 
     doorwayM.exitPanel = {
         x = (love.graphics.getWidth()/2) - 450,
-        y = (love.graphics.getHeight()/2) - 100,
+        y = (love.graphics.getHeight()/2) - 500,
         yMove = -love.graphics.getHeight(),
         sprite = util.sprites:getSprite("inferno_enter_panel"),
         bloomedFlowers = {},
@@ -110,7 +110,7 @@ function doorwayM:load()
 end
 
 function doorwayM:update()
-    doorwayM.exitPanel.y = (love.graphics.getHeight()/2) - 100 + doorwayM.exitPanel.yMove
+    doorwayM.exitPanel.y = (love.graphics.getHeight()/2) - 200 + doorwayM.exitPanel.yMove
     doorwayM.exitPanelPgL.y = doorwayM.exitPanel.y - 40
     doorwayM.exitPanelPgR.y = doorwayM.exitPanel.y - 40
 
@@ -122,6 +122,12 @@ end
 function doorwayM:openExitPanel()
     doorwayM.exitPanel.bloomedFlowers = flowerM:getBloomedFlowers() 
     doorwayM.exitFlowerSelectButtons = {}
+
+    if util.dialogue.tutorial.fullyComplete == false and util.dialogue.tutorial.doorwaySelect == false and util.dialogue.tutorial.doorwayEnter then
+        util.dialogue.tutorial.doorwaySelect = true
+        util.dialogue.tutorial.fullyComplete = true
+        util.dialogue:initiateDialogue("virgil", "doorwaySelect")
+    end
 
     for f,f1 in pairs(doorwayM.exitPanel.bloomedFlowers) do
         local newB = {

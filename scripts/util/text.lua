@@ -12,7 +12,6 @@ function text:load()
     }, "text") 
 end
 
--- Added alignLeft and wrapText parameters
 function text:createText(id, string, pallet, boundX, alignLeft, wrapText)
     pallet = pallet or util.sprites.pallets.text
     boundX = boundX or 0
@@ -44,7 +43,6 @@ function text:createText(id, string, pallet, boundX, alignLeft, wrapText)
         originY = 0
     }
 
-    -- Helper to handle internal text setup (wrapping vs scaling)
     newText.refreshText = function()
         if newText.wrapText and newText.boundX > 0 then
             newText.textInstance:setf(newText.rawText, newText.boundX, "left")
@@ -52,18 +50,14 @@ function text:createText(id, string, pallet, boundX, alignLeft, wrapText)
             newText.textInstance:set(newText.rawText)
         end
         
-        -- originX: 0 for left-aligned, half-width for centered
         newText.originX = newText.alignLeft and 0 or (newText.textInstance:getWidth() / 2)
         
-        -- originY: 0 pins the TOP of the text to newText.y
-        -- This ensures wrapping only expands the text downwards.
         newText.originY = 0 
     end
 
     newText.updateScale = function()
-        newText.fitScale = 1 -- Default to no scaling
+        newText.fitScale = 1 
         
-        -- Only calculate a shrink-to-fit scale if NOT wrapping and boundX is set
         if not newText.wrapText and newText.boundX > 0 then
             local width = newText.textInstance:getWidth()
             if width > newText.boundX then
@@ -75,7 +69,6 @@ function text:createText(id, string, pallet, boundX, alignLeft, wrapText)
     newText.draw = function()
         newText:updateScale()
         
-        -- We multiply your external scaleX/Y by the internal fitScale
         love.graphics.draw(
             newText.textInstance,
             newText.x,
@@ -105,11 +98,17 @@ function text:createText(id, string, pallet, boundX, alignLeft, wrapText)
         newText:refreshText()
     end
 
-    -- Initial setup
     newText:refreshText()
     
     text.textObjects[id] = newText
     return newText
+end
+
+function text:createRiseText(x, y, id, string, pallet, boundX, alignLeft, wrapText)
+    local txt = text:createText(id, string, pallet, boundX, alignLeft, wrapText)
+    txt.x, txt.y = x, y
+
+    return txt
 end
 
 return text

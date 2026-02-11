@@ -2,6 +2,7 @@ flowerM = require("scripts/garden/flowerM")
 altarM = require("scripts/garden/altarM")
 gardenM = require("scripts/garden/gardenM")
 doorwayM = require("scripts/garden/doorwayM")
+minigameM = require("scripts/garden/minigameM")
 
 sceneM = require("scripts/util/sceneM")
 
