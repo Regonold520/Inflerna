@@ -40,7 +40,10 @@ function text:createText(id, string, pallet, boundX, alignLeft, wrapText)
         alignLeft = alignLeft,
         wrapText = wrapText,
         originX = 0,
-        originY = 0
+        originY = 0,
+        opacity = 1,
+        rID = love.math.random(1,100000),
+        rot = 0
     }
 
     newText.refreshText = function()
@@ -51,8 +54,8 @@ function text:createText(id, string, pallet, boundX, alignLeft, wrapText)
         end
         
         newText.originX = newText.alignLeft and 0 or (newText.textInstance:getWidth() / 2)
-        
-        newText.originY = 0 
+
+        newText.originY = newText.textInstance:getHeight() / 2 
     end
 
     newText.updateScale = function()
@@ -68,17 +71,21 @@ function text:createText(id, string, pallet, boundX, alignLeft, wrapText)
 
     newText.draw = function()
         newText:updateScale()
+
+        love.graphics.setColor(1,1,1, newText.opacity)
         
         love.graphics.draw(
             newText.textInstance,
             newText.x,
             newText.y,
-            0,
+            newText.rot,
             newText.scaleX * newText.fitScale, 
             newText.scaleY * newText.fitScale,
             newText.originX,
             newText.originY
         )
+
+        love.graphics.setColor(1,1,1,1)
     end
 
     newText.changeText = function(newStr)
@@ -106,7 +113,17 @@ end
 
 function text:createRiseText(x, y, id, string, pallet, boundX, alignLeft, wrapText)
     local txt = text:createText(id, string, pallet, boundX, alignLeft, wrapText)
-    txt.x, txt.y = x, y
+    txt.x, txt.y, txt.scaleX, txt.scaleY, txt.opacity = x, y, 5, 5, 1
+
+    local newRot = love.math.random(-10, 10)
+    local speed = 0.5
+
+    util.tween:tweenProperty(txt, "x", txt.x + (newRot*1.5), speed, "txtX"..txt.rID , "out")
+    util.tween:tweenProperty(txt, "y", txt.y - 100, speed, "txtY"..txt.rID , "out")
+    
+    util.tween:tweenProperty(txt, "rot", math.rad(txt.rot + newRot), speed, "txtRot"..txt.rID , "out")
+
+    util.time:runDeferred(0.1, function() util.tween:tweenProperty(txt, "opacity", 0,speed - 0.1, "txtOpacity"..txt.rID , "out") end)
 
     return txt
 end

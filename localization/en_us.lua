@@ -63,5 +63,12 @@ return {
                 {text="Good luck. Dante..."}
             }
         }
+    },
+    taskPerformance = {
+        perfect = {text="PERFECT"},
+        great = {text="GREAT"},
+        good = {text="GOOD"},
+        bad = {text="BAD"},
+        miss = {text="MISS"}
     }
 }

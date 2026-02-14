@@ -9,6 +9,7 @@ sceneM = require("scripts/util/sceneM")
 infernoIntermission = require("scripts/inferno/infernoIntermission")
 infernoM = require("scripts/inferno/infernoM")
 layerV = require("scripts/inferno/layerVisuals")
+
 playerM = require("scripts/inferno/playerM")
 enemyM = require("scripts/inferno/enemyM")
 battleM = require("scripts/inferno/battleM")

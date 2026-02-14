@@ -56,10 +56,6 @@ function battleM:draw()
     end
 
     for b,b1 in ipairs(battleM.moveButtons) do
-
-    end 
-
-    for b,b1 in ipairs(battleM.moveButtons) do
         if battleM.currentBattle ~= nil then
             if battleM.currentBattle.party[b1.flowerIdx] ~= nil then
                 if battleM.currentBattle.party[b1.flowerIdx].data.moveSet[b] ~= nil then

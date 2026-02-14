@@ -1,0 +1,25 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Love2D",
+            "type": "shell",
+            "command": "konsole -e bash -c 'love .'",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared",
+                "focus": false,
+                "close": true
+            },
+            "runOptions": {
+                "instanceLimit": 1,
+                "reevaluateOnRerun": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}
