@@ -11,7 +11,9 @@ function battleM:load()
 end
 
 function battleM:update(dt)
+    
     if battleM.currentBattle ~= nil then
+        print(battleM.currentBattle.bulletAnim)
         if battleM.currentBattle.phase == "enemy" then
 
             for e,e1 in pairs(battleM.currentBattle.enemies) do
@@ -90,7 +92,7 @@ function battleM:genMoveButtons()
         txt.y = 0
         txt.baseScale = 0.5
 
-        txt.boundX = util.sprites:getSprite("kindness_move_button"):getWidth() / 1.3
+        txt.boundX = util.sprites:getSprite("kindness_move_button"):getWidth() / 1.4
 
         local moveButton = {
             x=playerM.player.x - 150,
@@ -105,6 +107,8 @@ function battleM:genMoveButtons()
             if battleM.currentBattle ~= nil then
                 if battleM.currentBattle.phase == "player" then
                     if battleM.currentBattle.bulletAnim == false then
+                        battleM.currentBattle.bulletAnim = true
+
                         local f = battleM.currentBattle.party[moveButton.flowerIdx]
                         local newBullet = {
                             x = f.x,
@@ -113,8 +117,6 @@ function battleM:genMoveButtons()
                         }
 
                         table.insert(battleM.bullets, newBullet)
-
-                        battleM.currentBattle.bulletAnim = true
 
                         util.tween:tweenProperty(newBullet, "x", battleM.currentBattle.enemies[1].x, 0.2, "BulletX".. #battleM.bullets, "out")
                         util.tween:tweenProperty(newBullet, "y", battleM.currentBattle.enemies[1].y - battleM.currentBattle.enemies[1].sprite:getHeight()/2, 0.2, "BulletY".. #battleM.bullets, "out")
@@ -141,8 +143,11 @@ function battleM:genMoveButtons()
                                     if moveButton.flowerIdx < #battleM.currentBattle.party then
                                         battleM:moveMoveButtons(moveButton.flowerIdx + 1)
                                     else
+                                        battleM.currentBattle.bulletAnim = true
                                         battleM:enemyPhase()
                                     end
+
+                                    
                                 end
                             end
                         end
@@ -187,7 +192,8 @@ function battleM:resetAfterKill(enemy)
         util.time:runDeferred(1, function() enemyM:randomLayerSpawn(1, 4, lastEnemyX + 200) end)
     else
         battleM:repositionEnemies(lastEnemyX)
-        battleM.currentBattle.bulletAnim = false
+        util.time:runDeferred(0.8, function() battleM.currentBattle.bulletAnim = false end)
+        
     end
 
 end
@@ -252,6 +258,7 @@ function battleM:startBattle(party,enemies)
 end
 
 function battleM:playerPhase()
+    battleM.currentBattle.bulletAnim = false
     for f,f1 in pairs(playerM.currentParty) do
         util.tween:tweenProperty(f1.healthBar, "offsetX", -200, 0.7, "HealthBarX"..f, "out")
     end
@@ -305,6 +312,7 @@ end
 
 function battleM:enemyPhase()
     battleM.currentBattle.phase = "enemy"
+    battleM.currentBattle.bulletAnim = true
 
     for e,e1 in pairs(battleM.currentBattle.enemies) do 
         e1:load()
@@ -327,9 +335,18 @@ function battleM:enemyPhase()
         util.tween:tweenProperty(b1.label, "x", playerM.player.x - 150 , 0.7 + ((b-1) * 0.05), "MoveButtonTextX"..b, "out")
     end
 
-    for f,f1 in ipairs(battleM.currentBattle.party) do
-        util.tween:tweenProperty(f1, "x", f1.x + ((playerM.player.x - f1.x)*2) , 0.6, "FlowerXMove"..f, "out")
+    if battleM.currentBattle and battleM.currentBattle.party then
+        for f,f1 in ipairs(battleM.currentBattle.party) do
+            if f1 then
+                local targetX = playerM.player.x - 20 - 
+                ((f + (f%2)-1) * 17)
+                util.tween:tweenProperty(f1, "x", targetX, 0.6, "FlowerXMove"..f, "out")
+            end
+        end
     end
+
+
+
 
     util.time:runDeferred(battleM.currentBattle.enemies[1].attackDuration, function() battleM:playerPhase() end)
 end

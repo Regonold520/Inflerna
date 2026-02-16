@@ -109,7 +109,11 @@ function enemyM:spawnEnemies(enemies, x)
 
             battleM.bullets = {}
 
-            if newEnemy.health <= 0 then newEnemy.die() else util.time:runDeferred(0.4,function()battleM.currentBattle.bulletAnim = false end) end
+            if newEnemy.health <= 0 then newEnemy.die() else util.time:runDeferred(0.8,function()
+                if battleM.currentBattle.phase == "player" then
+                    battleM.currentBattle.bulletAnim = false
+                end
+            end) end
         end
 
         newEnemy.die = function()

@@ -20,7 +20,7 @@ function altarM:load()
     }
 
     altarM.altar.onClick = function()
-        if altarM.altarGuiEnabled == false and altarM.occupiedSeed == nil then
+        if altarM.altarGuiEnabled == false and altarM.occupiedSeed == nil and cam.roomPos == 1 then
             if util.dialogue.tutorial.fullyComplete == false and util.dialogue.tutorial.altarExplain == false then
                 util.dialogue.tutorial.altarExplain = true
                 util.time:runDeferred(0.1, function()util.dialogue:initiateDialogue("virgil", "altarExplain")end)

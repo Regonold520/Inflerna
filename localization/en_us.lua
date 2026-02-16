@@ -70,5 +70,10 @@ return {
         good = {text="GOOD"},
         bad = {text="BAD"},
         miss = {text="MISS"}
+    },
+    taskModifierTypes = {
+        attack = {text="Attack"},
+        shield = {text="Shield"},
+        effect = {text="Effect"}
     }
 }

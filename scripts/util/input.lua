@@ -71,10 +71,10 @@ function input:markDead(obj)
 end
 
 function input:cleanup()
-    if sceneM.scenes[targetScene] ~= nil then
-        for i = #sceneM.scenes[targetScene].inputObjects, 1, -1 do
-            if sceneM.scenes[targetScene].inputObjects[i].dead then
-                table.remove(sceneM.scenes[targetScene].inputObjects, i)
+    if sceneM.scenes[sceneM.activeScene] ~= nil then
+        for i = #sceneM.scenes[sceneM.activeScene].inputObjects, 1, -1 do
+            if sceneM.scenes[sceneM.activeScene].inputObjects[i].dead then
+                table.remove(sceneM.scenes[sceneM.activeScene].inputObjects, i)
             end
         end
     end

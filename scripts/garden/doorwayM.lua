@@ -21,7 +21,7 @@ function doorwayM:load()
     util.input:addClickable(doorwayM.door,"garden")
 
     doorwayM.door.onClick = function()
-        if not doorwayM.endSequence then
+        if not doorwayM.endSequence and cam.roomPos == -1 then
             if not doorwayM.exitMenuOpen then
                 doorwayM:openExitPanel()
                 util.tween:tweenProperty(altarM,"vignetteZoomMult" , 1.1, 1, "vignetteZoom", "out")

@@ -25,6 +25,14 @@ util.dialogue = require("scripts/util/dialogue")
 
 lang = require("localization/en_us")
 
+cpf = 0
+local paused = false
+
+
+function love.focus(f)
+    paused = not f
+end
+
 cam = {
     x = 0,
     y = -50,
@@ -68,6 +76,10 @@ function love.load()
 end
 
 function love.update(dt)
+    if paused then
+        return
+    end
+
     util.tween:update(dt)
 
     util.time:update(dt)
@@ -82,8 +94,8 @@ function love.update(dt)
         util.input.mousejustpressed = false
         util.input:loopClickers()
     end
+    cpf = 0
 end
-
 
 function love.keypressed(key, scancode, isrepeat)
     
@@ -146,9 +158,12 @@ function love.draw()
 end
 
 function love.mousepressed(x, y, button, istouch)
-   if button == 1 then
-      util.input.mousejustpressed = true
-   end
+    if cpf == 0 then
+        if button == 1 then
+            cpf = cpf + 1
+            util.input.mousejustpressed = true
+        end
+    end
 end
 
 
