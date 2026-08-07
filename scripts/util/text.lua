@@ -43,7 +43,8 @@ function text:createText(id, string, pallet, boundX, alignLeft, wrapText)
         originY = 0,
         opacity = 1,
         rID = love.math.random(1,100000),
-        rot = 0
+        rot = 0,
+        id = id
     }
 
     newText.refreshText = function()
@@ -60,6 +61,7 @@ function text:createText(id, string, pallet, boundX, alignLeft, wrapText)
 
     newText.updateScale = function()
         newText.fitScale = 1 
+
         
         if not newText.wrapText and newText.boundX > 0 then
             local width = newText.textInstance:getWidth()
@@ -72,21 +74,31 @@ function text:createText(id, string, pallet, boundX, alignLeft, wrapText)
     newText.draw = function()
         newText:updateScale()
 
+        local width = newText.textInstance:getWidth()
+
+
+        local fit = newText.fitScale
+
+        if newText.allowUpscale == false then
+            fit = math.min(1, fit)
+        end
+
         love.graphics.setColor(1,1,1, newText.opacity)
-        
+            
         love.graphics.draw(
             newText.textInstance,
             newText.x,
             newText.y,
             newText.rot,
-            newText.scaleX * newText.fitScale, 
-            newText.scaleY * newText.fitScale,
+            newText.scaleX * fit, 
+            newText.scaleY * fit,
             newText.originX,
             newText.originY
         )
 
         love.graphics.setColor(1,1,1,1)
     end
+
 
     newText.changeText = function(newStr)
         newText.rawText = newStr

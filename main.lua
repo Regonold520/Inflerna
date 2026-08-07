@@ -90,10 +90,9 @@ function love.update(dt)
     util.hitbox:update(dt)
     util.dialogue:update(dt)
 
-    if util.input.mousejustpressed then
-        util.input.mousejustpressed = false
-        util.input:loopClickers()
-    end
+
+    util.input:loopClickers()
+
     cpf = 0
 end
 

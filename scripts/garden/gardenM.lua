@@ -28,8 +28,12 @@ function gardenM:update(dt)
     dtimer = dtimer + dt
     
     if gardenM.cameraStatic == false then
-        gardenM.mX = ((love.mouse.getX() - love.graphics:getWidth() / 2)/40)
-        gardenM.mY = ((love.mouse.getY() - love.graphics:getHeight() / 2)/40)
+        if gardenM.mX ~= ((love.mouse.getX() - love.graphics:getWidth() / 2)/40) then
+            util.tween:tweenProperty(gardenM, "mX", ((love.mouse.getX() - love.graphics:getWidth() / 2)/40), 0.1, "GardenMX", "out")
+        end
+        if gardenM.mY ~= ((love.mouse.getY() - love.graphics:getHeight() / 2)/40) then
+            util.tween:tweenProperty(gardenM, "mY", ((love.mouse.getY() - love.graphics:getHeight() / 2)/40), 0.1, "GardenMY", "out")
+        end
     elseif gardenM.mX ~= 0 or gardenM.mY ~= 0 then
         util.tween:tweenProperty(gardenM, "mX", 0, 0.5, "GardenMX", "out")
         util.tween:tweenProperty(gardenM, "mY", 0, 0.5, "GardenMY", "out")

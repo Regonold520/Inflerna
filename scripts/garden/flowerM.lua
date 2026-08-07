@@ -544,7 +544,7 @@ end
 
 function flowerM:createPot()
     local newPot = {
-        flower = nil,
+        flower = flowerM:generateRandomFlower(),
         sprite = util.sprites:getSprite("pot"),
         x = 0,
         y = 0,
@@ -552,7 +552,7 @@ function flowerM:createPot()
     }
 
     newPot.onClick = function()
-        if newPot.flower ~= nil and gardenM.currentTool == "wateringCan" then
+        if newPot.flower ~= nil then
             local f = newPot.flower
 
             if f.growthStage == "bulb" and f.growth >= 10 then
@@ -561,10 +561,12 @@ function flowerM:createPot()
             elseif f.growthStage == "stem" and f.growth >= 50 then
                 f.growthStage = "bloom"
             end
-        elseif newPot.flower ~= nil then
+
             if  gardenM.cameraStatic == false and cam.roomPos == 0 then
                 if newPot.flower.growthStage == nil then
-                    minigameM:startMinigame("fertiliser", newPot)
+                    if gardenM.currentTool == "wateringCan" then
+                        minigameM:startMinigame("fertiliser", newPot)
+                    end
                 else
                     flowerM:openFlowerInfo(newPot)
                 end
@@ -647,17 +649,36 @@ function flowerM:drawUI()
         end
 
         for m1,m in ipairs(flowerM.infoUi.moveDisplays) do
-            love.graphics.draw(m.sprite, m.x, m.y + math.sin(deltaTimer + (m1/2))*10, m.rot, 6, 6, m.sprite:getWidth()/2, m.sprite:getHeight()/2)
+            if m1 == flowerM.infoUi.selectedMove then
+                for t,t1 in ipairs(m.texts) do
+                    if flowerM.infoUi.moveDisplays[2] ~= nil then
+                        if t1.id == "mDisplayDesc2" then
+                            t1.originY = -7
+                        end
+                    end
+
+                    t1.y = t1.baseY + math.sin(deltaTimer + (m1/2))*10
+                    t1:draw()
+                end
+            end
+            
+            love.graphics.draw(m.sprite, m.x, m.y + math.sin(deltaTimer + (m1/2))*10, m.rot, 6,6, m.sprite:getWidth()/2, m.sprite:getHeight()/2)
+            m.txt.x = m.x
+            m.txt.y = m.y + math.sin(deltaTimer + (m1/2))*10
+
+            
+
+            m.txt:draw()
         end
     end
 end 
 
 flowerM.infoUi = nil
 
+local flowerGuiSpeed = 0.8
 function flowerM:openFlowerInfo(pot)
     battleM:addMoveSet(pot.flower)
 
-    print(pot.flower.data.v1,pot.flower.data.v2,pot.flower.data.v3)
 
     local pV1 = pot.flower.data.v1
     local pV2 = nil
@@ -667,15 +688,30 @@ function flowerM:openFlowerInfo(pot)
         pV2 = pot.flower.data.v2
     end
 
-    if pot.flower.data.v3 ~= pV1 then
+    if pot.flower.data.v3 ~= pV1 and pot.flower.data.v3 ~= pV2 then
         pV3 = pot.flower.data.v3
     end
 
     local newUi = {
         titleText = util.text:createText("flowerInfoTitle", pV1, util.sprites.pallets[pV1]),
         vDisplays = {},
-        moveDisplays = {}
+        moveDisplays = {},
+        selectedMove = 0
     }
+
+    util.time:runDeferred(flowerGuiSpeed, function()
+        newUi.returnActor = {
+            x = 0,
+            y = 0,
+            sprite = util.sprites:getSprite("SCREEN-CONSUMER"),
+            layer = 99
+        }
+
+        newUi.returnActor.onClick = function()
+            flowerM:closeFlowerInfo()
+        end
+
+        util.input:addClickable(newUi.returnActor,sceneM.activeScene, true) end)
 
     local vCount = 0
     local mCount = 0
@@ -689,11 +725,27 @@ function flowerM:openFlowerInfo(pot)
             rot = 0
         }
 
+        local cPallet = util.sprites.pallets[pV2] or util.sprites.pallets[pV1]
         newUi.moveDisplays[1] = {
             x = -love.graphics:getWidth()/2,
             y = love.graphics:getHeight()/2,
-            sprite = util.sprites:getSprite(pot.flower.data.moveSet[1].type.. "_move_button")
+            sprite = util.sprites:getSprite(pot.flower.data.moveSet[1].type.. "_move_button"),
+            txt = util.text:createText("moveDisplayText1", pot.flower.data.moveSet[1].name, util.sprites.pallets[pot.flower.data.moveSet[1].type], 70),
+            layer = 999,
+            scaleX = 0.6,
+            scaleY = 0.6,
+            texts = {
+                [1] = util.text:createText("mDisplayDmg1", pot.flower.data.moveSet[1].damage.. " Damage", util.sprites.pallets[pot.flower.data.moveSet[1].type], 0, true),
+                [2] = util.text:createText("mDisplayPierce1", pot.flower.data.moveSet[1].pierce.. " Pierce", cPallet, 0, true)
+            }
         }
+
+        newUi.moveDisplays[1].onClick = function()
+            flowerM:flowerInfoMove(1)
+        end
+
+        
+        util.input:addClickable(newUi.moveDisplays[1],"garden",true)
     end
     if pV2 ~= nil then
         vCount = vCount + 1
@@ -717,45 +769,80 @@ function flowerM:openFlowerInfo(pot)
 
         newUi.moveDisplays[2] = {
             x = -love.graphics:getWidth()/2,
+            
             y = love.graphics:getHeight()/2,
-            sprite = util.sprites:getSprite(pot.flower.data.moveSet[2].type.. "_move_button")
+            sprite = util.sprites:getSprite(pot.flower.data.moveSet[2].type.. "_move_button"),
+            txt = util.text:createText("moveDisplayText1", pot.flower.data.moveSet[2].name, util.sprites.pallets[pot.flower.data.moveSet[2].type], 70),
+            scaleX = 0.6,
+            scaleY = 0.6,
+            layer = 999,
+            texts = {
+                [1] = util.text:createText("mDisplayDmg2", pot.flower.data.moveSet[2].damage.. " Damage", util.sprites.pallets[pot.flower.data.moveSet[2].type], 0, true),
+                [2] = util.text:createText("mDisplayPierce2", pot.flower.data.moveSet[2].pierce.. " Pierce", util.sprites.pallets[pot.flower.data.moveSet[2].type], 0, true),
+                [3] = util.text:createText("mDisplayDesc2", "This is a placeholder description for a secondary ability", util.sprites.pallets.dialogueText, 250, false, true)
+            }
         }
+
+        newUi.moveDisplays[2].onClick = function()
+            flowerM:flowerInfoMove(2)
+        end
+
+        
+        util.input:addClickable(newUi.moveDisplays[2],"garden",true)
+    end
+
+    newUi.moveDisplays[1].txt.scaleX, newUi.moveDisplays[1].txt.scaleY = 3, 3
+
+    for t,t1 in ipairs(newUi.moveDisplays[1].texts) do
+        t1.scaleX, t1.scaleY = 3,3
+        t1.x = -love.graphics:getWidth()/2
+        t1.y = love.graphics:getHeight()/2
+    end
+
+    if newUi.moveDisplays[2] ~= nil then
+        newUi.moveDisplays[2].txt.scaleX, newUi.moveDisplays[2].txt.scaleY = 3, 3
+
+        for t,t1 in ipairs(newUi.moveDisplays[2].texts) do
+            t1.scaleX, t1.scaleY = 3,3
+            t1.x = -love.graphics:getWidth()/2
+            t1.y = love.graphics:getHeight()/2
+        end
     end
 
     local dist = 120
 
     if vCount == 1 then
-        util.tween:tweenProperty(newUi.vDisplays[1], "y", love.graphics:getHeight()/5, 1, "vDisplay1Y", "out")
+        util.tween:tweenProperty(newUi.vDisplays[1], "y", love.graphics:getHeight()/5, flowerGuiSpeed, "vDisplay1Y", "out")
     elseif vCount == 2 then
-        util.tween:tweenProperty(newUi.vDisplays[1], "x", love.graphics:getWidth()/2 - dist, 1, "vDisplay1X", "out")
-        util.tween:tweenProperty(newUi.vDisplays[1], "y", love.graphics:getHeight()/5, 1, "vDisplay1Y", "out")
-        util.tween:tweenProperty(newUi.vDisplays[1], "rot", math.rad(-4), 1, "vDisplay1Rot", "out")
+        util.tween:tweenProperty(newUi.vDisplays[1], "x", love.graphics:getWidth()/2 - dist, flowerGuiSpeed, "vDisplay1X", "out")
+        util.tween:tweenProperty(newUi.vDisplays[1], "y", love.graphics:getHeight()/5, flowerGuiSpeed, "vDisplay1Y", "out")
+        util.tween:tweenProperty(newUi.vDisplays[1], "rot", math.rad(-4), flowerGuiSpeed, "vDisplay1Rot", "out")
 
-        util.tween:tweenProperty(newUi.vDisplays[2], "x", love.graphics:getWidth()/2 + dist, 1, "vDisplay2X", "out")
-        util.tween:tweenProperty(newUi.vDisplays[2], "y", love.graphics:getHeight()/5, 1, "vDisplay2Y", "out")
-        util.tween:tweenProperty(newUi.vDisplays[2], "rot", math.rad(4), 1, "vDisplay2Rot", "out")
+        util.tween:tweenProperty(newUi.vDisplays[2], "x", love.graphics:getWidth()/2 + dist, flowerGuiSpeed, "vDisplay2X", "out")
+        util.tween:tweenProperty(newUi.vDisplays[2], "y", love.graphics:getHeight()/5, flowerGuiSpeed, "vDisplay2Y", "out")
+        util.tween:tweenProperty(newUi.vDisplays[2], "rot", math.rad(4), flowerGuiSpeed, "vDisplay2Rot", "out")
     else
-        util.tween:tweenProperty(newUi.vDisplays[1], "x", love.graphics:getWidth()/2 - dist*1.5, 1, "vDisplay1X", "out")
-        util.tween:tweenProperty(newUi.vDisplays[1], "y", love.graphics:getHeight()/5, 1, "vDisplay1Y", "out")
-        util.tween:tweenProperty(newUi.vDisplays[1], "rot", math.rad(-7), 1, "vDisplay1Rot", "out")
+        util.tween:tweenProperty(newUi.vDisplays[1], "x", love.graphics:getWidth()/2 - dist*1.5, flowerGuiSpeed, "vDisplay1X", "out")
+        util.tween:tweenProperty(newUi.vDisplays[1], "y", love.graphics:getHeight()/5, flowerGuiSpeed, "vDisplay1Y", "out")
+        util.tween:tweenProperty(newUi.vDisplays[1], "rot", math.rad(-7), flowerGuiSpeed, "vDisplay1Rot", "out")
 
-        util.tween:tweenProperty(newUi.vDisplays[2], "x", love.graphics:getWidth()/2, 1, "vDisplay2X", "out")
-        util.tween:tweenProperty(newUi.vDisplays[2], "y", love.graphics:getHeight()/5 - 30, 1, "vDisplay2Y", "out")
+        util.tween:tweenProperty(newUi.vDisplays[2], "x", love.graphics:getWidth()/2, flowerGuiSpeed, "vDisplay2X", "out")
+        util.tween:tweenProperty(newUi.vDisplays[2], "y", love.graphics:getHeight()/5 - 30, flowerGuiSpeed, "vDisplay2Y", "out")
         
 
-        util.tween:tweenProperty(newUi.vDisplays[3], "x", love.graphics:getWidth()/2 + dist*1.5, 1, "vDisplay3X", "out")
-        util.tween:tweenProperty(newUi.vDisplays[3], "y", love.graphics:getHeight()/5, 1, "vDisplay3Y", "out")
-        util.tween:tweenProperty(newUi.vDisplays[3], "rot", math.rad(7), 1, "vDisplay3Rot", "out")
+        util.tween:tweenProperty(newUi.vDisplays[3], "x", love.graphics:getWidth()/2 + dist*1.5, flowerGuiSpeed, "vDisplay3X", "out")
+        util.tween:tweenProperty(newUi.vDisplays[3], "y", love.graphics:getHeight()/5, flowerGuiSpeed, "vDisplay3Y", "out")
+        util.tween:tweenProperty(newUi.vDisplays[3], "rot", math.rad(7), flowerGuiSpeed, "vDisplay3Rot", "out")
     end
 
     if mCount == 1 then
-        util.tween:tweenProperty(newUi.moveDisplays[1], "x", love.graphics:getHeight()/2.5, 1, "moveDisplay1X", "out")
-    else
-        util.tween:tweenProperty(newUi.moveDisplays[1], "x", love.graphics:getHeight()/2.5, 1, "moveDisplay1X", "out")
-        util.tween:tweenProperty(newUi.moveDisplays[1], "y", love.graphics:getHeight()/2 - 70, 1, "moveDisplay1Y", "out")
+        util.tween:tweenProperty(newUi.moveDisplays[1], "x", love.graphics:getWidth()/4, flowerGuiSpeed, "moveDisplay1X", "out")
+    elseif mCount == 2 then
+        util.tween:tweenProperty(newUi.moveDisplays[1], "x", love.graphics:getWidth()/4, flowerGuiSpeed, "moveDisplay1X", "out")
+        util.tween:tweenProperty(newUi.moveDisplays[1], "y", love.graphics:getHeight()/2 - 70, flowerGuiSpeed, "moveDisplay1Y", "out")
 
-        util.tween:tweenProperty(newUi.moveDisplays[2], "x", love.graphics:getHeight()/2.5, 1, "moveDisplay2X", "out")
-        util.tween:tweenProperty(newUi.moveDisplays[2], "y", love.graphics:getHeight()/2 + 70, 1, "moveDisplay2Y", "out")
+        util.tween:tweenProperty(newUi.moveDisplays[2], "x", love.graphics:getWidth()/4, flowerGuiSpeed, "moveDisplay2X", "out")
+        util.tween:tweenProperty(newUi.moveDisplays[2], "y", love.graphics:getHeight()/2 + 70, flowerGuiSpeed, "moveDisplay2Y", "out")
     end
 
     newUi.titleText.x = love.graphics:getWidth()/2
@@ -766,12 +853,81 @@ function flowerM:openFlowerInfo(pot)
 
     flowerM.infoUi = newUi
 
-    util.tween:tweenProperty(cam, "zoom", 10.5, 1, "CamZoom", "out")
-    util.tween:tweenProperty(cam, "projX", pot.x, 1, "camTweenX", "out")
-    util.tween:tweenProperty(cam, "yAddition", pot.y - 10, 1, "CamMoveY", "out")
-    util.tween:tweenProperty(altarM,"vignetteZoomMult" , 0.9, 1, "vignetteZoom", "out")
+    util.tween:tweenProperty(cam, "zoom", 10.5, flowerGuiSpeed, "CamZoom", "out")
+    util.tween:tweenProperty(cam, "projX", pot.x, flowerGuiSpeed, "camTweenX", "out")
+    util.tween:tweenProperty(cam, "yAddition", pot.y - 10, flowerGuiSpeed, "CamMoveY", "out")
+    util.tween:tweenProperty(altarM,"vignetteZoomMult" , 0.9, flowerGuiSpeed, "vignetteZoom", "out")
 
     gardenM.cameraStatic = true
+end
+
+function flowerM:closeFlowerInfo()
+    flowerM.infoUi.selectedMove = 0
+    util.tween:tweenProperty(cam, "zoom", 5, flowerGuiSpeed, "CamZoom", "out")
+    util.tween:tweenProperty(cam, "projX", 0, flowerGuiSpeed, "CamMoveX", "out")
+    util.tween:tweenProperty(cam, "yAddition", 0, flowerGuiSpeed, "CamMoveY", "out")
+
+    util.tween:tweenProperty(altarM,"vignetteZoomMult" , 4, flowerGuiSpeed, "vignetteZoom", "out")
+
+    if flowerM.infoUi.moveDisplays[1] ~= nil then
+        util.tween:tweenProperty(flowerM.infoUi.moveDisplays[1],"x" , -love.graphics:getWidth()/2, flowerGuiSpeed, "moveDisplay1X", "out")
+        util.tween:tweenProperty(flowerM.infoUi.moveDisplays[1],"y" , love.graphics:getHeight()/2, flowerGuiSpeed, "moveDisplay1Y", "out")
+    end
+
+    if flowerM.infoUi.moveDisplays[2] ~= nil then
+        util.tween:tweenProperty(flowerM.infoUi.moveDisplays[2],"x" , -love.graphics:getWidth()/2, flowerGuiSpeed, "moveDisplay2X", "out")
+        util.tween:tweenProperty(flowerM.infoUi.moveDisplays[2],"y" , love.graphics:getHeight()/2, flowerGuiSpeed, "moveDisplay1Y", "out")
+    end
+
+    if flowerM.infoUi.vDisplays[1] ~= nil then
+        util.tween:tweenProperty(flowerM.infoUi.vDisplays[1],"x" , love.graphics:getWidth()/2, flowerGuiSpeed, "vDisplay1X", "out")
+        util.tween:tweenProperty(flowerM.infoUi.vDisplays[1],"y" , -love.graphics:getHeight()/2, flowerGuiSpeed, "vDisplay1Y", "out")
+    end
+    if flowerM.infoUi.vDisplays[2] ~= nil then
+        util.tween:tweenProperty(flowerM.infoUi.vDisplays[2],"x" , love.graphics:getWidth()/2, flowerGuiSpeed, "vDisplay2X", "out")
+        util.tween:tweenProperty(flowerM.infoUi.vDisplays[2],"y" , -love.graphics:getHeight()/2, flowerGuiSpeed, "vDisplay2Y", "out")
+    end
+    if flowerM.infoUi.vDisplays[3] ~= nil then
+        util.tween:tweenProperty(flowerM.infoUi.vDisplays[3],"x" , love.graphics:getWidth()/2, flowerGuiSpeed, "vDisplay3X", "out")
+        util.tween:tweenProperty(flowerM.infoUi.vDisplays[3],"y" , -love.graphics:getHeight()/2, flowerGuiSpeed, "vDisplay3Y", "out")
+    end
+
+
+
+    util.time:runDeferred(flowerGuiSpeed, function()
+        gardenM.cameraStatic = false
+        flowerM.infoUi = nil
+    end)
+
+    util.input:markDead(flowerM.infoUi.returnActor)
+
+    
+end
+
+function flowerM:flowerInfoMove(idx)
+    if flowerM.infoUi.selectedMove == idx then idx = 0 end
+    flowerM.infoUi.selectedMove = idx
+
+    for m,m1 in ipairs(flowerM.infoUi.moveDisplays) do
+        if m == idx then
+            util.tween:tweenProperty(m1,"x" , love.graphics:getWidth()/7, 0.2, "moveDisplay"..m.."X", "out")
+
+            for t,t1 in ipairs(m1.texts) do
+                t1.baseY = m1.y 
+                t1.x = m1.x - 70
+
+                util.tween:tweenProperty(t1,"x" , love.graphics:getWidth()/4, 0.3, "moveDisplayTxt"..t.."X"..m, "out")
+                util.tween:tweenProperty(t1,"baseY" , m1.y + ((t-1)*50), 0.3, "moveDisplayTxt"..t.."Y"..m, "out")
+
+            end
+        else
+            util.tween:tweenProperty(m1,"x" , love.graphics:getWidth()/4, 0.2, "moveDisplay"..m.."X", "out")
+
+            for t,t1 in ipairs(m1.texts) do
+                util.tween:tweenProperty(t1,"x" , -love.graphics:getWidth()/2, 0.2, "moveDisplayTxt"..t.."X"..m, "out")
+            end
+        end
+    end
 end
 
 return flowerM

@@ -83,16 +83,15 @@ function battleM:draw()
     end
 end
 
+
 function battleM:genMoveButtons()
     battleM.moveButtons = {}
 
     for i=1,2 do
-        local txt = util.text:createText("MoveButton"..i, "test"..i, util.sprites.pallets.temperance)
+        local txt = util.text:createText("MoveButton"..i, "test"..i, util.sprites.pallets.temperance, 70)
         txt.x = playerM.player.x - 150
         txt.y = 0
-        txt.baseScale = 0.5
-
-        txt.boundX = util.sprites:getSprite("kindness_move_button"):getWidth() / 1.4
+        txt.scaleX, txt.scaleY = 0.5,0.5
 
         local moveButton = {
             x=playerM.player.x - 150,

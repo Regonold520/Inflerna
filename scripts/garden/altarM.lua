@@ -97,7 +97,7 @@ function altarM:load()
                 end
             end
 
-            blessedSeed.layer = 1
+            blessedSeed.layer = 2
 
             util.input:addClickable(blessedSeed,"garden")
 
@@ -251,6 +251,21 @@ function altarM:update(dt)
     if util.tween.activeTweens.altarRiseUp ~= nil then
         cam.yAddition = util.tween.activeTweens.altarRiseUp.value
     end
+
+    if altarM.occupiedSeed ~= nil then
+        if altarM.occupiedSeed.clicked == false then 
+            altarM.occupiedSeed.x = altarM.altar.x
+            altarM.occupiedSeed.y = altarM.altar.y + 15
+        end
+    end
+
+    for _, s1 in pairs(altarM.pendingSeeds) do
+        if s1.clicked == false then 
+            s1.x = altarM.altar.x
+            s1.y = altarM.altar.y + 15
+        end
+    end
+
 end
 
 function altarM:draw()
@@ -285,8 +300,8 @@ function altarM:draw()
     if altarM.altarGuiEnabled and altarM.slots.primary.virtue ~= nil then
         if obj ~= nil then
             obj.x = altarM.altar.x
-            obj.y = altarM.altar.y + obj.sinY - 26
-            love.graphics.draw(obj.sprite,obj.x, obj.y+5, obj.rot, 1, 1, obj.sprite:getWidth()/2, obj.sprite:getHeight()/2)
+            obj.y = altarM.altar.y + obj.sinY - 20
+            love.graphics.draw(obj.sprite,obj.x, obj.y+5, obj.rot, 1, 1, obj.sprite:getWidth()/2, obj.sprite:getHeight())
         end
     end
 end

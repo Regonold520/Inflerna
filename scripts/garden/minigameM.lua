@@ -19,6 +19,22 @@ function minigameM:load()
         "#2e6b9a",
         "#173c58"
     }, "blue")
+
+    minigameM.minigames = {
+        ["fertiliser"] = {
+            startFunc = minigameM.fertiliserStart,
+            runFunc = minigameM.fertiliserRun,
+            drawFunc = minigameM.fertiliserDraw,
+            modifierType = "attack"
+        },
+        ["water"] = {
+            preStartFunc = minigameM.waterPreStart,
+            startFunc = minigameM.waterStart,
+            runFunc = minigameM.waterRun,
+            drawFunc = minigameM.waterDraw,
+            modifierType = "defence"
+        }
+    }
 end
 
 local deltaTimer = 0
@@ -33,9 +49,7 @@ end
 
 function minigameM:drawUI()
     if minigameM.currentMinigame ~= nil then
-        if minigameM.currentMinigame.active then
-            minigameM.currentMinigame:drawFunc()
-        end
+        minigameM.currentMinigame:drawFunc()
     end
 
     for t,t1 in pairs(minigameM.texts) do
@@ -87,10 +101,10 @@ end
 
 function minigameM:startMinigame(id, pot)
     if minigameM.currentMinigame == nil then
-        print(id)
         local minigameEntry = {
             pot = pot,
             minigameId = id,
+            preStartFunc = minigameM.minigames[id].preStartFunc,
             startFunc = minigameM.minigames[id].startFunc,
             runFunc = minigameM.minigames[id].runFunc,
             drawFunc = minigameM.minigames[id].drawFunc,
@@ -109,6 +123,11 @@ function minigameM:startMinigame(id, pot)
         util.tween:tweenProperty(cam, "yAddition", pot.y + 5, 1, "CamMoveY", "out")
 
         util.tween:tweenProperty(altarM,"vignetteZoomMult" , 0.5, 1, "vignetteZoom", "out")
+
+        if minigameEntry.preStartFunc ~= nil then
+            minigameEntry.preStartFunc()
+        end
+
 
         util.time:runDeferred(1, function()
             minigameEntry.startFunc()
@@ -131,9 +150,99 @@ function minigameM:endMinigame()
     end)
 end
 
+function minigameM:createEndScreen(score)
+    local evalRank = nil
+
+    if score >= 75 and score < 90 then
+        evalRank = "F"
+    elseif score >= 90 and score < 105 then
+        evalRank = "C"
+    elseif score >= 105 and score < 120 then
+        evalRank = "B"
+    elseif score >= 120  and score < 135 then
+        evalRank = "A"
+    elseif score >= 135 then
+        evalRank = "P"
+    end
+
+    print("input score = ",score, "output rank = ", evalRank)
+
+    local newScreen = {
+        x=-love.graphics:getWidth(),
+        y=love.graphics:getHeight()/2,
+        bgSprite = util.sprites:getSprite("minigame_status_bg"),
+        rankSprite = util.sprites:getSprite("minigame_rank_".. evalRank),
+        rank = {
+            x = 160,
+            y = -450,
+            rot = 200,
+            scale = 10,
+            rankActive = false
+        },
+        bloomButton = {
+            x = 0,
+            y = 0,
+            rot = 0,
+            scale = 0.7,
+            scaleX = 0.7,
+            scaleY = 0.7,
+            sprite = util.sprites:palletSwap(util.sprites:getSprite("flower_bloom_button"), util.sprites.pallets.chastity, util.sprites.pallets[minigameM.currentMinigame.pot.flower.data.chosenColour])
+        }
+    }
+
+    util.input:addClickable(newScreen.bloomButton,"garden", true)
+
+    newScreen.bloomButton.onClick = function()
+        if not minigameM.currentMinigame then
+            return
+        end
+        minigameM.currentMinigame.pot.flower.growthStage = "bulb"
+        minigameM.currentMinigame.pot.flower.growth = 0
+
+        util.input:markDead(newScreen.bloomButton)
+        minigameM:endMinigame()
+    end
+
+
+
+    local newPal = nil
+    if score < 100 then
+        newPal = util.sprites.pallets.red
+    elseif score == 100 then
+        newPal = util.sprites.pallets.chastity
+    elseif score == 150 then
+        newPal = util.sprites.pallets.patience
+    else
+        newPal = util.sprites.pallets.kindness
+    end
+
+    newScreen.endText = util.text:createText("EndText", "Modifier: ".. score.. "%", newPal,0, true)
+    newScreen.modifierTypeText = util.text:createText("modifierTypeText",lang.taskModifierTypes[minigameM.currentMinigame.modifierType].text , util.sprites.pallets.blue,0, true)
+    newScreen.bloomText = util.text:createText("modifierBloomText", "Flower ready for bloom!", util.sprites.pallets[minigameM.currentMinigame.pot.flower.data.chosenColour],150, true, true)
+
+    minigameM.currentMinigame.endScreen = newScreen
+
+    util.tween:tweenProperty(newScreen, "x", love.graphics:getWidth()/5, 0.3, "minigameEndBg", "out")
+
+    util.time:runDeferred(0.28, function()
+        newScreen.rank.rankActive = true
+        util.tween:tweenProperty(newScreen.rank, "x", -120, 0.19, "minigameRankX", "out")
+        util.tween:tweenProperty(newScreen.rank, "y", -200, 0.2, "minigameRankY", "out")
+        util.tween:tweenProperty(newScreen.rank, "scale", 0.7, 0.2, "minigameRankScale", "out")
+        util.tween:tweenProperty(newScreen.rank, "rot", -10, 0.22, "minigameRankRot", "out")
+
+
+
+        
+    end)
+
+    util.time:runDeferred(0.48, function() util.tween:tweenProperty(newScreen.rank, "scale", 1, 0.1, "minigameRankScale", "out") end)
+end
+
+-- Fertiliser --
+
 function minigameM:fertiliserStart()
     if not minigameM.currentMinigame then
-        print("Warning: fertiliserTick called but no current minigame!")
         return
     end
 
@@ -144,34 +253,6 @@ function minigameM:fertiliserStart()
     }
 
     minigameM:fertiliserTick()
-end
-
-
-function minigameM:fertiliserTick()
-    print(util.sprites.pallets[minigameM.currentMinigame.pot.flower.data.chosenColour])
-    local newButton = {
-        x = love.graphics:getWidth()/2 + love.math.random(-200, 200),
-        y = love.graphics:getHeight()/2 + love.math.random(-200, 200),
-        sprite = util.sprites:palletSwap(util.sprites:getSprite("fert_button"), util.sprites.pallets.chastity, util.sprites.pallets[minigameM.currentMinigame.pot.flower.data.chosenColour]),
-        radius = 30,
-        scaleX = 0.7,
-        scaleY = 0.7,
-        forceClose = false,
-        layer = 100,
-        isUi = true
-    }
-
-    newButton.onClick = function()
-        if minigameM.currentMinigame ~= nil then
-            cam.shake(love.math.random(-200,200))
-            newButton.forceClose = true
-        end
-    end
-
-    util.input:addClickable(newButton,"garden", true)
-
-    table.insert(minigameM.currentMinigame.activeData.buttons, newButton)
-
 end
 
 function minigameM:fertiliserRun(dt)
@@ -238,114 +319,125 @@ function minigameM:fertiliserRun(dt)
 end
 
 function minigameM:fertiliserDraw()
-    for b,b1 in pairs(minigameM.currentMinigame.activeData.buttons) do
-        love.graphics.draw(b1.sprite, b1.x, b1.y, 0, b1.scaleX*cam.zoom, b1.scaleY*cam.zoom, b1.sprite:getWidth()/2, b1.sprite:getHeight()/2)
+    if minigameM.currentMinigame.active then
+        for b,b1 in pairs(minigameM.currentMinigame.activeData.buttons) do
+            love.graphics.draw(b1.sprite, b1.x, b1.y, 0, b1.scaleX*cam.zoom, b1.scaleY*cam.zoom, b1.sprite:getWidth()/2, b1.sprite:getHeight()/2)
 
-        local r, g, b = 0.16470588235294117,0.16862745098039217,0.1803921568627451
+            local r, g, b = 0.16470588235294117,0.16862745098039217,0.1803921568627451
 
-        if b1.radius > 8 and b1.radius < 10 then r, g, b = 0.596078431372549 , 0.4627450980392157, 0.21568627450980393 end
+            if b1.radius > 8 and b1.radius < 10 then r, g, b = 0.596078431372549 , 0.4627450980392157, 0.21568627450980393 end
 
-        love.graphics.setColor(r, g, b ,1)
-        drawPixelCircle(b1.x - (0.5*cam.zoom), b1.y  - (0.5*cam.zoom), b1.radius)
-        love.graphics.setColor(1,1,1,1)
+            love.graphics.setColor(r, g, b ,1)
+            drawPixelCircle(b1.x - (0.5*cam.zoom), b1.y  - (0.5*cam.zoom), b1.radius)
+            love.graphics.setColor(1,1,1,1)
+        end
     end
 end
 
-minigameM.minigames = {
-    ["fertiliser"] = {
-        startFunc = minigameM.fertiliserStart,
-        runFunc = minigameM.fertiliserRun,
-        drawFunc = minigameM.fertiliserDraw,
-        modifierType = "attack"
-    }
-}
-
-function minigameM:createEndScreen(score)
-    local evalRank = nil
-
-    if score >= 75 and score < 90 then
-        evalRank = "F"
-    elseif score >= 90 and score < 105 then
-        evalRank = "C"
-    elseif score >= 105 and score < 120 then
-        evalRank = "B"
-    elseif score >= 120  and score < 135 then
-        evalRank = "A"
-    elseif score >= 135 then
-        evalRank = "P"
-    end
-
-    print("input score = ",score, "output rank = ", evalRank)
-
-    local newScreen = {
-        x=-love.graphics:getWidth(),
-        y=love.graphics:getHeight()/2,
-        bgSprite = util.sprites:getSprite("minigame_status_bg"),
-        rankSprite = util.sprites:getSprite("minigame_rank_".. evalRank),
-        rank = {
-            x = 160,
-            y = -450,
-            rot = 200,
-            scale = 10,
-            rankActive = false
-        },
-        bloomButton = {
-            x = 0,
-            y = 0,
-            rot = 0,
-            scale = 0.7,
-            sprite = util.sprites:palletSwap(util.sprites:getSprite("flower_bloom_button"), util.sprites.pallets.chastity, util.sprites.pallets[minigameM.currentMinigame.pot.flower.data.chosenColour])
-        }
+function minigameM:fertiliserTick()
+    local newButton = {
+        x = love.graphics:getWidth()/2 + love.math.random(-200, 200),
+        y = love.graphics:getHeight()/2 + love.math.random(-200, 200),
+        sprite = util.sprites:palletSwap(util.sprites:getSprite("fert_button"), util.sprites.pallets.chastity, util.sprites.pallets[minigameM.currentMinigame.pot.flower.data.chosenColour]),
+        radius = 30,
+        scaleX = 0.7,
+        scaleY = 0.7,
+        forceClose = false,
+        layer = 100,
+        isUi = true
     }
 
-    util.input:addClickable(newScreen.bloomButton,"garden", true)
-
-    newScreen.bloomButton.onClick = function()
-        if not minigameM.currentMinigame then
-            print("Warning: fertiliserTick called but no current minigame!")
-            return
+    newButton.onClick = function()
+        if minigameM.currentMinigame ~= nil then
+            cam.shake(love.math.random(-200,200))
+            newButton.forceClose = true
         end
-        minigameM.currentMinigame.pot.flower.growthStage = "bulb"
-        minigameM.currentMinigame.pot.flower.growth = 0
-
-        util.input:markDead(newScreen.bloomButton)
-        minigameM:endMinigame()
     end
 
+    util.input:addClickable(newButton,"garden", true)
 
+    table.insert(minigameM.currentMinigame.activeData.buttons, newButton)
 
-    local newPal = nil
-    if score < 100 then
-        newPal = util.sprites.pallets.red
-    elseif score == 100 then
-        newPal = util.sprites.pallets.chastity
-    elseif score == 150 then
-        newPal = util.sprites.pallets.patience
+end
+
+-- Water --
+
+function minigameM:waterPreStart()
+    local progressBar = {
+        sprite = util.sprites:getSprite("water_progress_bar"),
+        x = love.graphics:getWidth()/2,
+        y = love.graphics:getHeight()*1.5,
+        scaleX = 0.5,
+        scaleY = 0.5
+    }
+
+    local progressGague = {
+        sprite = util.sprites:getSprite("water_progress_gague"),
+        x = love.graphics:getWidth()/2,
+        y = love.graphics:getHeight()*1.5,
+        scaleX = 0.5,
+        scaleY = 0.5
+    }
+
+    local wateringCan = {
+        sprite = util.sprites:getSprite("watering_can"),
+        x = love.graphics:getWidth()/1.4,
+        y = -love.graphics:getHeight()*1.5,
+        rot = 0,
+        scaleX = 1,
+        scaleY = 1
+    }
+
+    minigameM.currentMinigame.activeData = {
+        progressBar =  progressBar,
+        wateringCan = wateringCan,
+        progressGague = progressGague,
+        progress = 50
+    }
+    
+
+    util.tween:tweenProperty(progressBar, "y", love.graphics:getHeight()/1.2, 1, "waterProgressBarY", "out")
+    util.tween:tweenProperty(progressGague, "y", love.graphics:getHeight()/1.2, 1, "waterProgressGagueY", "out")
+    util.tween:tweenProperty(wateringCan, "y", love.graphics:getHeight()/5, 1, "wateringCanY", "out")
+end
+
+function minigameM:waterStart()
+    if not minigameM.currentMinigame then
+        return
+    end
+end
+
+local waterSpeed = 0.5
+local accel = 0
+function minigameM:waterRun(dt)
+    print(accel)
+
+    if love.mouse.isDown(1) then
+        accel = accel + 0.05
+        minigameM.currentMinigame.activeData.progress = clamp(0 , minigameM.currentMinigame.activeData.progress + waterSpeed*accel, 100)
     else
-        newPal = util.sprites.pallets.kindness
-    end
+        accel = accel - 0.05
+        minigameM.currentMinigame.activeData.progress = clamp(0 , minigameM.currentMinigame.activeData.progress - waterSpeed, 100)
+    end 
 
-    newScreen.endText = util.text:createText("EndText", "Modifier: ".. score.. "%", newPal,0, true)
-    newScreen.modifierTypeText = util.text:createText("modifierTypeText",lang.taskModifierTypes[minigameM.currentMinigame.modifierType].text , util.sprites.pallets.blue,0, true)
-    newScreen.bloomText = util.text:createText("modifierBloomText", "Flower ready for bloom!", util.sprites.pallets[minigameM.currentMinigame.pot.flower.data.chosenColour],150, true, true)
+    accel = clamp(0, accel, 3)
+end
 
-    minigameM.currentMinigame.endScreen = newScreen
+function minigameM:waterDraw()
+    local o = minigameM.currentMinigame.activeData.progressBar
 
-    util.tween:tweenProperty(newScreen, "x", love.graphics:getWidth()/5, 0.3, "minigameEndBg", "out")
+    love.graphics.draw(o.sprite, o.x, o.y, 0, o.scaleX*cam.zoom,o.scaleY*cam.zoom, o.sprite:getWidth()/2, o.sprite:getHeight()/2)
 
-    util.time:runDeferred(0.28, function()
-        newScreen.rank.rankActive = true
-        util.tween:tweenProperty(newScreen.rank, "x", -120, 0.19, "minigameRankX", "out")
-        util.tween:tweenProperty(newScreen.rank, "y", -200, 0.2, "minigameRankY", "out")
-        util.tween:tweenProperty(newScreen.rank, "scale", 0.7, 0.2, "minigameRankScale", "out")
-        util.tween:tweenProperty(newScreen.rank, "rot", -10, 0.22, "minigameRankRot", "out")
+    o = minigameM.currentMinigame.activeData.progressGague
 
+    local gagueOffset = ((minigameM.currentMinigame.activeData.progress - 50) * 0.88) * cam.zoom
+
+    love.graphics.draw(o.sprite, o.x + gagueOffset, o.y, 0, o.scaleX*cam.zoom,o.scaleY*cam.zoom, o.sprite:getWidth()/2, o.sprite:getHeight()/2)
 
 
-        
-    end)
+    o = minigameM.currentMinigame.activeData.wateringCan
 
-    util.time:runDeferred(0.48, function() util.tween:tweenProperty(newScreen.rank, "scale", 1, 0.1, "minigameRankScale", "out") end)
+    love.graphics.draw(o.sprite, o.x, o.y, math.rad(o.rot), o.scaleX*cam.zoom,o.scaleY*cam.zoom, o.sprite:getWidth()/1.1, 0)
 end
 
 return minigameM
