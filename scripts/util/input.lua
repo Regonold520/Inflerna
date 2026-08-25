@@ -84,16 +84,6 @@ function input:markDead(obj)
     obj.dead = true
 end
 
-function input:cleanup()
-    if sceneM.scenes[sceneM.activeScene] ~= nil then
-        for i = #sceneM.scenes[sceneM.activeScene].inputObjects, 1, -1 do
-            if sceneM.scenes[sceneM.activeScene].inputObjects[i].dead then
-                table.remove(sceneM.scenes[sceneM.activeScene].inputObjects, i)
-            end
-        end
-    end
-end
-
 input.layerColours = {}
 function input:load()
     for i=-10, 2000 do
@@ -105,6 +95,19 @@ function input:load()
 
         table.insert(input.layerColours, newColour)
     end
+end
+
+function input:update(dt)
+    if sceneM.scenes[sceneM.activeScene] ~= nil then
+        for i = #sceneM.scenes[sceneM.activeScene].inputObjects, 1, -1 do
+            if sceneM.scenes[sceneM.activeScene].inputObjects[i].dead then
+                table.remove(sceneM.scenes[sceneM.activeScene].inputObjects, i)
+            end
+        end
+    end
+
+
+    input.mousejustpressed = false
 end
 
 function input:addClickable(obj,targetScene ,isUi)

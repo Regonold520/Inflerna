@@ -162,6 +162,7 @@ function sprites:drawObject(obj)
     local offsetX = obj.offsetX or 0
     local offsetY = obj.offsetY or 0
 
+
     love.graphics.draw(obj.sprite, obj.x + offsetX, obj.y + offsetY, 0, sX, sY, oX, oY)
 end
 

@@ -4,7 +4,7 @@ sceneM.scenes = {}
 
 function sceneM:load()
     local gardenScene = sceneM:createScene("garden",{
-        gardenM,altarM, flowerM, doorwayM, minigameM
+        gardenM, altarM, flowerM, doorwayM, minigameM, indexM
     })
 
     local infernoScene = sceneM:createScene("inferno",{

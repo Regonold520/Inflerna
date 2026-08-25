@@ -4,7 +4,7 @@
         {
             "label": "Run Love2D",
             "type": "shell",
-            "command": "konsole -e bash -c 'love .'",
+            "command": "SDL_VIDEODRIVER=wayland love .",
             "group": {
                 "kind": "build",
                 "isDefault": true

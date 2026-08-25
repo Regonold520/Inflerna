@@ -12,6 +12,13 @@ altarM.occupiedSeed = nil
 altarM.pendingSeeds = {}
 
 function altarM:load()
+    util.stateM:registerState("altarOpen")
+    util.stateM:addBool("altarOpen", altarM, "altarGuiEnabled", false)
+    util.stateM:addExists("altarOpen", altarM, "occupiedSeed", false)
+    util.stateM:addInt("altarOpen", cam, "roomPos", 1)
+    util.stateM:addBool("altarOpen", indexM, "indexOpen", false)
+
+
     altarM.altar = {
         x=util.sprites:getSprite("eden_bg"):getWidth()/2 + util.sprites:getSprite("altar_bg"):getWidth()/2,
         y=-30,
@@ -20,7 +27,7 @@ function altarM:load()
     }
 
     altarM.altar.onClick = function()
-        if altarM.altarGuiEnabled == false and altarM.occupiedSeed == nil and cam.roomPos == 1 then
+        if util.stateM:getState("altarOpen") then
             if util.dialogue.tutorial.fullyComplete == false and util.dialogue.tutorial.altarExplain == false then
                 util.dialogue.tutorial.altarExplain = true
                 util.time:runDeferred(0.1, function()util.dialogue:initiateDialogue("virgil", "altarExplain")end)
@@ -104,7 +111,7 @@ function altarM:load()
             util.tween:tweenProperty(altarM,"vignetteZoomMult" , 4, 1, "vignetteZoom", "out")
             util.tween:tweenProperty(altarM,"slotsZoomMult" , 4, 1, "slotsZoom", "out")
             util.tween:tweenProperty(cam,"zoomModifier" , 1, 1, "altarZoomIn", "out")
-            util.tween:tweenProperty(cam,"yAddition" , 0,1.5, "altarRiseUp", "out")
+            util.tween:tweenProperty(cam,"yAddition" , 0,1.5, "camTweenY", "out")
             util.tween:tweenProperty(altarM.slots.primary,"y" , -love.graphics:getHeight(),1.5, "primaryFall", "out")
             util.tween:tweenProperty(altarM.slots.secondary,"y" , -love.graphics:getHeight(),1.6, "secondaryFall", "out")
             util.tween:tweenProperty(altarM.slots.tertiary,"y" , -love.graphics:getHeight(),1.7, "tertiaryFall", "out")

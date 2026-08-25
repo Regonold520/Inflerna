@@ -3,6 +3,7 @@ altarM = require("scripts/garden/altarM")
 gardenM = require("scripts/garden/gardenM")
 doorwayM = require("scripts/garden/doorwayM")
 minigameM = require("scripts/garden/minigameM")
+indexM = require("scripts/garden/indexM")
 
 sceneM = require("scripts/util/sceneM")
 
@@ -22,6 +23,7 @@ util.input = require("scripts/util/input")
 util.text = require("scripts/util/text")
 util.hitbox = require("scripts/util/hitbox")
 util.dialogue = require("scripts/util/dialogue")
+util.stateM = require("scripts/util/stateM")
 
 lang = require("localization/en_us")
 
@@ -86,12 +88,14 @@ function love.update(dt)
     
     sceneM:update(dt)
 
-    util.input:cleanup(dt)
+    util.input:loopClickers()
+
+    util.input:update(dt)
     util.hitbox:update(dt)
     util.dialogue:update(dt)
 
 
-    util.input:loopClickers()
+    
 
     cpf = 0
 end
