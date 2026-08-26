@@ -6,6 +6,8 @@ crawler.shield = 10
 crawler.x = 0
 crawler.y = 0
 
+crawler.affinities = {"limbo"}
+
 crawler.hitbox = {
     offsetX = 0,
     offsetY = -9,

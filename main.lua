@@ -24,6 +24,7 @@ util.text = require("scripts/util/text")
 util.hitbox = require("scripts/util/hitbox")
 util.dialogue = require("scripts/util/dialogue")
 util.stateM = require("scripts/util/stateM")
+util.eventM = require("scripts/util/eventM")
 
 lang = require("localization/en_us")
 
@@ -93,7 +94,7 @@ function love.update(dt)
     util.input:update(dt)
     util.hitbox:update(dt)
     util.dialogue:update(dt)
-
+    util.eventM:update(dt)
 
     
 

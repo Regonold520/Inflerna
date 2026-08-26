@@ -75,5 +75,15 @@ return {
         attack = {text="Attack"},
         shield = {text="Shield"},
         effect = {text="Effect"}
+    },
+    enemyData = {
+        crawler = {
+            name = {text="Crawler"},
+            layer = {text="Limbo"},
+            description = {text="A hunk of amalgamated flesh and muscles forced to roam limbo in a porcelain vessel"},
+            affinities1 = {
+                {text="Limbo"}
+            }
+        }
     }
 }

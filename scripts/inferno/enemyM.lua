@@ -7,6 +7,7 @@ enemyM.deletionTweens = {}
 
 function enemyM:load()
     enemyM:registerEnemies()
+    util.eventM:emit("enemiesLoaded")
 end
 
 function enemyM:update(dt)
@@ -164,6 +165,7 @@ function enemyM:registerEnemy(id, layerID)
     local enemy = require("scripts/enemies/"..layerID.. "/"..id)
     enemy.sprite = util.sprites:getSprite(id)
     enemy.layer = layerID
+    enemy.name = id
 
     enemyM.registeredEnemies[layerID][id] = enemy
 end

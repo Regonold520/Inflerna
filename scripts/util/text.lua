@@ -55,8 +55,10 @@ function text:createText(id, string, pallet, boundX, alignLeft, wrapText)
         end
         
         newText.originX = newText.alignLeft and 0 or (newText.textInstance:getWidth() / 2)
-
         newText.originY = newText.textInstance:getHeight() / 2 
+        if newText.wrapText then
+            newText.originY = 0
+        end
     end
 
     newText.updateScale = function()
