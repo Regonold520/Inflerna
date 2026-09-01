@@ -84,6 +84,14 @@ return {
             affinities1 = {
                 {text="Limbo"}
             }
+        },
+        harpy = {
+            name = {text="Harpy"},
+            layer = {text="Limbo"},
+            description = {text="Something something description"},
+            affinities1 = {
+                {text="Limbo"}
+            }
         }
     }
 }

@@ -114,23 +114,25 @@ function indexM:draw()
 end
 
 function indexM:drawUI()
-
-    love.graphics.draw(indexM.book.sprite, indexM.book.x + (40*cam.zoom), indexM.book.y + indexM.book.offsetY, 0, cam.zoom, cam.zoom,
+    if indexM.book.offsetY > -700 then
+        love.graphics.draw(indexM.book.sprite, indexM.book.x + (40*cam.zoom), indexM.book.y + indexM.book.offsetY, 0, cam.zoom, cam.zoom,
         indexM.book.sprite:getWidth()/2, indexM.book.sprite:getHeight()/2)
 
-    -- Draw Page
-    local s = 30
-    local scale = math.min(
-        s / indexM.pages[indexM.currentPage].sprite:getWidth(),
-        s / indexM.pages[indexM.currentPage].sprite:getHeight()
-    )
+        local s = 30
+        local scale = math.min(
+            s / indexM.pages[indexM.currentPage].sprite:getWidth(),
+            s / indexM.pages[indexM.currentPage].sprite:getHeight()
+        )
 
-    love.graphics.draw(indexM.pages[indexM.currentPage].sprite, indexM.book.x + (-10*cam.zoom), indexM.book.y + indexM.book.offsetY - (20*cam.zoom), 0,scale* cam.zoom,scale* cam.zoom,
-        indexM.pages[indexM.currentPage].sprite:getWidth()/2, indexM.pages[indexM.currentPage].sprite:getHeight()/2)
-    
-    for _,i in pairs(indexM.pages[indexM.currentPage].texts) do
-        i:draw()
+        love.graphics.draw(indexM.pages[indexM.currentPage].sprite, indexM.book.x + (-10*cam.zoom), indexM.book.y + indexM.book.offsetY - (20*cam.zoom), 0,scale* cam.zoom,scale* cam.zoom,
+            indexM.pages[indexM.currentPage].sprite:getWidth()/2, indexM.pages[indexM.currentPage].sprite:getHeight()/2)
+        
+        for _,i in pairs(indexM.pages[indexM.currentPage].texts) do
+            i:draw()
+        end
     end
+
+    
 end
 
 return indexM

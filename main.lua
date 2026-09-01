@@ -26,6 +26,8 @@ util.dialogue = require("scripts/util/dialogue")
 util.stateM = require("scripts/util/stateM")
 util.eventM = require("scripts/util/eventM")
 
+util.lovebug =  require("scripts/util/lovebug")
+
 lang = require("localization/en_us")
 
 cpf = 0
@@ -66,6 +68,24 @@ function love.load()
     util.text:load()
     util.hitbox:load()
     util.dialogue:load()
+
+    --[[
+
+    util.lovebug:load()
+
+    util.lovebug:watch("altarM")
+    util.lovebug:watch("gardenM")
+    util.lovebug:watch("enemyM")
+    util.lovebug:watch("battleM")
+    util.lovebug:watch("playerM")
+    util.lovebug:watch("infernoM")
+    util.lovebug:watch("doorwayM")
+    util.lovebug:watch("flowerM")
+    util.lovebug:watch("indexM")
+    util.lovebug:watch("minigameM")
+
+    ]]
+
     sceneM:load()
 
 
@@ -96,7 +116,7 @@ function love.update(dt)
     util.dialogue:update(dt)
     util.eventM:update(dt)
 
-    
+    util.lovebug:update(dt)
 
     cpf = 0
 end

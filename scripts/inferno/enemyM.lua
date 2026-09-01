@@ -38,6 +38,7 @@ end
 
 function enemyM:registerEnemies()
     enemyM:registerEnemy("crawler", "limbo")
+    enemyM:registerEnemy("harpy", "limbo")
 end
 
 function enemyM:protectedTween(obj, property, final, time, id, lerp)
