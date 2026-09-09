@@ -16,16 +16,26 @@ flowerM.pots = {}
 function flowerM:load()
     flowerM:registerFlowerData()
 
-    for py=0, 2 do
-        for px=0, 5 do
-            local peakPot = flowerM:createPot()
+    local potPos = {
+        {x=-86,y=9},
+        {x=-64,y=30},
+        {x=-35,y=40},
+        {x=0,y=44},
+        {x=86,y=9},
+        {x=64,y=30},
+        {x=35,y=40}
+    }
 
-            peakPot.x = -75 + (px*30)
-            peakPot.y = -15 + (py*30)
+    for k,v in pairs(potPos) do
+        local newPot = flowerM:createPot()
+
+        newPot.x = v.x
+        newPot.y = v.y
+    end
+
+    
         
             
-        end
-    end
 
     
 end
@@ -357,6 +367,7 @@ end
 
 function flowerM:drawIndividualFlowerPot(flower, pot)
     pot = pot or {x=0, y=0, sprite=util.sprites:getSprite("pot")}
+    local potTake = 19
 
     if flower ~= nil then
         local scaleM = math.min(1, math.max(0.5, flower.growth / 50))
@@ -364,7 +375,7 @@ function flowerM:drawIndividualFlowerPot(flower, pot)
         love.graphics.draw(
             flower.sprites.stem,
             pot.x,
-            pot.y - 11 + pot.sprite:getHeight()/2,
+            pot.y - potTake + pot.sprite:getHeight()/2,
             0,
             scaleM,
             scaleM,
@@ -380,7 +391,7 @@ function flowerM:drawIndividualFlowerPot(flower, pot)
             love.graphics.draw(
                 flower.sprites.head,
                 pot.x + flower.translation.stem.x,
-                pot.y + flower.translation.stem.y - 11 + pot.sprite:getHeight()/2,
+                pot.y + flower.translation.stem.y - potTake + pot.sprite:getHeight()/2,
                 0,
                 scaleM,
                 scaleM,
@@ -392,7 +403,7 @@ function flowerM:drawIndividualFlowerPot(flower, pot)
             love.graphics.draw(
                 flower.sprites.face,
                 pot.x + flower.translation.face.x + flower.translation.stem.x,
-                pot.y + flower.translation.face.y + flower.translation.stem.y - 11 + pot.sprite:getHeight()/2,
+                pot.y + flower.translation.face.y + flower.translation.stem.y - potTake + pot.sprite:getHeight()/2,
                 0,
                 scaleM,
                 scaleM,
@@ -407,7 +418,7 @@ function flowerM:drawIndividualFlowerPot(flower, pot)
                     love.graphics.draw(
                         flower.sprites.sideBulb,
                         pot.x + b1.x,
-                        pot.y - 11 + pot.sprite:getHeight()/2  + b1.y,
+                        pot.y - potTake + pot.sprite:getHeight()/2  + b1.y,
                         0,
                         scaleM,
                         scaleM,
@@ -424,7 +435,7 @@ function flowerM:drawIndividualFlowerPot(flower, pot)
             love.graphics.draw(
                 flower.sprites.bulb,
                 pot.x + flower.translation.stem.x,
-                pot.y + flower.translation.stem.y +1.5,
+                pot.y + flower.translation.stem.y +1.5 - 2,
                 0,
                 scaleM,
                 scaleM,
@@ -544,7 +555,7 @@ end
 
 function flowerM:createPot()
     local newPot = {
-        flower = nil,
+        flower = flowerM:generateRandomFlower(),
         sprite = util.sprites:getSprite("pot"),
         x = 0,
         y = 0,

@@ -44,8 +44,15 @@ function gardenM:update(dt)
 
 end
 
+
+local bgs = {"eden_bg_b", "eden_bg_m", "eden_bg_f"}
+local parallaxStrengths = {0.3, 0.25, 0}
 function gardenM:draw()
-    love.graphics.draw(util.sprites:getSprite("eden_bg"), 0, 0, 0, 1, 1, util.sprites:getSprite("eden_bg"):getWidth()/2, util.sprites:getSprite("eden_bg"):getHeight()/2)
+    for k, v in pairs(bgs) do
+        love.graphics.draw(util.sprites:getSprite(v), 0 + (cam.x * parallaxStrengths[k]), 0+ (cam.y * parallaxStrengths[k]), 0, 1, 1, util.sprites:getSprite(v):getWidth()/2, util.sprites:getSprite(v):getHeight()/2)
+    end
+    
+
     local waterSprite = gardenM.wateringCan.sprite
     if gardenM.currentTool == "wateringCan" then waterSprite = gardenM.wateringCan.selectedSprite end
 
