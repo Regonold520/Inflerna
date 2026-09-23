@@ -72,19 +72,21 @@
     function sceneM:draw()
         if sceneM.scenes[sceneM.activeScene] ~= nil then
             if sceneM.currentScene.rendering == sceneM.renderType.D2 then
-                cam:attach()
+                cam:attach(sceneM.renderType.D2)
                 for f,f1 in ipairs(sceneM.scenes[sceneM.activeScene].managers) do
                     if f1.draw ~= nil then
                         f1:draw()
                     end
                 end
-                cam:detach()
+                cam:detach(sceneM.renderType.D2)
             elseif sceneM.currentScene.rendering == sceneM.renderType.D25 then
+                cam:attach(sceneM.renderType.D25)
                 for f,f1 in ipairs(sceneM.scenes[sceneM.activeScene].managers) do
                     if f1.draw ~= nil then
                         f1:draw()
                     end
                 end
+                cam:detach(sceneM.renderType.D25)
             end
 
             for f,f1 in ipairs(sceneM.scenes[sceneM.activeScene].managers) do

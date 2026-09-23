@@ -175,10 +175,18 @@ function sprites:D25Draw(obj)
 
     local z = obj.z or 1
 
-    local newX = -((obj.x + offsetX + cam.x)/z)
-    local newY = ((obj.y + offsetY + cam.y)/z)
+    local rotY = 0
 
-    local newScaleX = sX / z
+    if obj.rot ~= nil then
+        if obj.rot.y ~= nil then
+            rotY = obj.rot.y
+        end
+    end
+
+    local newX = ((obj.x + offsetX - cam.x)/z)
+    local newY = ((obj.y + offsetY - cam.y)/z)
+
+    local newScaleX = (sX / z) * math.cos(rotY)
     local newScaleY = sY / z
 
     love.graphics.draw(obj.sprite, newX, newY, 0, newScaleX, newScaleY, oX, oY)

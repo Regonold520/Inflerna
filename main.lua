@@ -193,23 +193,25 @@ function love.mousepressed(x, y, button, istouch)
 end
 
 
-function cam:attach()
+function cam:attach(render)
     love.graphics.push()
 
     love.graphics.translate(
         love.graphics.getWidth() / 2,
         love.graphics.getHeight() / 2
     )
-
+    
     local screenScale = getScaleFactor()
     love.graphics.scale((self.zoom * cam.zoomModifier) * screenScale)
 
     love.graphics.rotate(math.rad(self.rot))
 
-    love.graphics.translate(-self.x, -self.y)
+    if render == sceneM.renderType.D2 then
+        love.graphics.translate(-self.x, -self.y)
+    end
 end
 
-function cam:detach()
+function cam:detach(render)
     love.graphics.pop()
 end
 
