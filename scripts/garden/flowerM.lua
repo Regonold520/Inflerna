@@ -164,7 +164,7 @@ function flowerM:registerFlowerData()
         "#844727"
     }, "humility")
 
-    flowerM:registerStemTranslation("humility",2)
+    flowerM:registerStemTranslation("humility",0)
     flowerM:registerStemTranslation("charity",0, 1)
     flowerM:registerStemTranslation("chastity",0,-2)
     flowerM:registerStemTranslation("temperance",0,0)
@@ -178,10 +178,10 @@ function flowerM:registerFlowerData()
     flowerM:registerStemTranslation("kindness-baby",0,1)
     flowerM:registerStemTranslation("charity-baby",0,3)
     flowerM:registerStemTranslation("patience-baby",-2,0)
-    flowerM:registerStemTranslation("humility-baby",1,-1)
+    flowerM:registerStemTranslation("humility-baby",0,-1)
 
     flowerM:registerStemBulb("patience", 5, -11)
-    flowerM:registerStemBulb("humility", -5,-10)
+    flowerM:registerStemBulb("humility", -7,-10)
 
     flowerM:registerStemBulb("temperance", 8,-10)
     flowerM:registerStemBulb("temperance", -8,-10)

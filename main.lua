@@ -26,6 +26,9 @@ util.dialogue = require("scripts/util/dialogue")
 util.stateM = require("scripts/util/stateM")
 util.eventM = require("scripts/util/eventM")
 
+util.renderTest = require("scripts/util/renderTest")
+
+
 util.lovebug =  require("scripts/util/lovebug")
 
 lang = require("localization/en_us")
@@ -44,15 +47,14 @@ cam = {
     projX=0,
     zoom = 5,
     rot = 0,
-    yAddition = 0
+    yAddition = 0,
+    zoomModifier = 1
 }
 
 cam.shake = function(strength)
     cam.rot = math.rad(strength)
     util.tween:tweenProperty(cam, "rot", 0, 1.5, "CamMoveRot", "out")
 end
-
-cam.zoomModifier = 1
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")

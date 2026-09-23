@@ -151,9 +151,7 @@ function sprites:palletSwapPath(targetPath, origPallet, newPallet)
     return imgData
 end
 
-
-
-function sprites:drawObject(obj)
+function sprites:D2Draw(obj)
     local sX = obj.scaleX or 1
     local sY = obj.scaleY or 1
     local oX = obj.originX or obj.sprite:getWidth()/2
@@ -164,6 +162,34 @@ function sprites:drawObject(obj)
 
 
     love.graphics.draw(obj.sprite, obj.x + offsetX, obj.y + offsetY, 0, sX, sY, oX, oY)
+end
+
+function sprites:D25Draw(obj)
+    local sX = obj.scaleX or 1
+    local sY = obj.scaleY or 1
+    local oX = obj.originX or obj.sprite:getWidth()/2
+    local oY = obj.originY or obj.sprite:getHeight()/2
+
+    local offsetX = obj.offsetX or 0
+    local offsetY = obj.offsetY or 0
+
+    local z = obj.z or 1
+
+    local newX = -((obj.x + offsetX + cam.x)/z)
+    local newY = ((obj.y + offsetY + cam.y)/z)
+
+    local newScaleX = sX / z
+    local newScaleY = sY / z
+
+    love.graphics.draw(obj.sprite, newX, newY, 0, newScaleX, newScaleY, oX, oY)
+end
+
+function sprites:drawObject(obj)
+    if sceneM.currentScene.rendering == sceneM.renderType.D2 then
+        sprites:D2Draw(obj)
+    elseif sceneM.currentScene.rendering == sceneM.renderType.D25 then
+        sprites:D25Draw(obj)
+    end
 end
 
 return sprites

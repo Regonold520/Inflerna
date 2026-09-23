@@ -7,6 +7,7 @@ gardenM.currentTool = ""
 
 function gardenM:load()
     cam.roomPos = 0
+    cam.roomPosY = 0
     gardenM.wateringCan = {
         x = -100,
         y = -5,
@@ -103,14 +104,26 @@ end
 
 function gardenM:keypressed(key, scancode, isrepeat)
     if gardenM.cameraStatic == false then
-        if key == "d" and cam.roomPos + 1 < 2 then
+        if key == "d" and cam.roomPos + 1 < 2 and cam.roomPosY == 0 then
             cam.roomPos = cam.roomPos + 1
             util.tween:tweenProperty(cam,"projX" , 390 * cam.roomPos, 2, "camTweenX", "out")
         end
 
-        if key == "a" and cam.roomPos - 1 > -2 then
+        if key == "a" and cam.roomPos - 1 > -2 and cam.roomPosY == 0 then
             cam.roomPos = cam.roomPos - 1
             util.tween:tweenProperty(cam,"projX" , 390 * cam.roomPos, 2, "camTweenX", "out")
+        end
+
+        if key == "w" and cam.roomPos == 0 and cam.roomPosY == 0 then
+            cam.roomPosY = 1
+            util.tween:tweenProperty(cam,"projX" , 390 * cam.roomPos, 2, "camTweenX", "out")
+            util.tween:tweenProperty(cam,"yAddition" , -230 * cam.roomPosY, 2, "camTweenY", "out")
+        end
+
+        if key == "s" and cam.roomPos == 0 and cam.roomPosY == 1 then
+            cam.roomPosY = 0
+            util.tween:tweenProperty(cam,"projX" , 390 * cam.roomPos, 2, "camTweenX", "out")
+            util.tween:tweenProperty(cam,"yAddition" , -230 * cam.roomPosY, 2, "camTweenY", "out")
         end
     end
 
