@@ -21,7 +21,7 @@
 
         local infernoScene = sceneM:createScene("inferno",{
             infernoIntermission,layerV, infernoM, playerM, enemyM, battleM
-        }):renderType(sceneM.renderType.D2)
+        }):renderType(sceneM.renderType.D25)
 
         local testScene = sceneM:createScene("test",{
             util.renderTest
@@ -55,7 +55,7 @@
             cam.roomPos = 0
         end
 
-        util.time:runDeferred(0.5, function() sceneM:switchScene("test") end)
+        util.time:runDeferred(0.5, function() sceneM:switchScene("garden") end)
         
     end
 

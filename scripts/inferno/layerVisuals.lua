@@ -5,13 +5,13 @@ function layerV:load()
     {
         r =0.18823529411764706, g = 0.17254901960784313, b = 0.1803921568627451
     }, {
-        {sprite=util.sprites:getSprite("limbo_building1"), x=0, y=0}
+        {sprite=util.sprites:getSprite("limbo_building1"), x=0, y=0, z= 4}
     }, {
-        {sprite=util.sprites:getSprite("limbo_building2"), x=0, y=0}
+        {sprite=util.sprites:getSprite("limbo_building2"), x=0, y=0, z= 3}
     }, {
-        {sprite=util.sprites:getSprite("limbo_bg_focal"), x=0, y=-10}
+        {sprite=util.sprites:getSprite("limbo_bg_focal"), x=0, y=0, z= 2.1, projectZ=100}
     }, {
-        {sprite=util.sprites:getSprite("limbo_bg_floor"), x=0, y=0}
+        {sprite=util.sprites:getSprite("limbo_bg_floor"), x=0, y=0, z= 2}
     }, {"crawler"})
 end
 
@@ -59,37 +59,35 @@ function layerV:loadChunk(idx)
 end
 
 function layerV:drawLayer()
-    for a,a1 in pairs(infernoM.currentLayer.focalPoint) do
-        love.graphics.draw(a1.sprite,layerV:parallaxX(a1.x, 1.995),a1.y,0,1,1,a1.sprite:getWidth()/2,a1.sprite:getHeight()/2)
+    local collected = {}
+
+    table.insert(collected, infernoM.currentLayer.focalPoint[1])
+    
+    for k,v in pairs(infernoM.loadedChunks) do
+        table.insert(collected, v.chunkBGFloor)
     end
 
-    for c,c1 in pairs(infernoM.loadedChunks) do
-        love.graphics.draw(infernoM.currentLayer.bgFloor[1].sprite,layerV:parallaxX((c1.chunkWidth*c1.idx), 1.5),80,0,1,1,infernoM.currentLayer.bgFloor[1].sprite:getWidth()/2,infernoM.currentLayer.bgFloor[1].sprite:getHeight()/2)
-    end
+    for _, assets in pairs(infernoM.loadedChunks) do
+        for _, asset in ipairs(assets.midgroundAssets) do
+            table.insert(collected, asset)
+        end
 
-    local collectedMG = {}
-    for c,c1 in pairs(infernoM.loadedChunks) do
-        for a,a1 in pairs(c1.midgroundAssets) do
-            table.insert(collectedMG, a1)
+        for _, asset in ipairs(assets.foregroundAssets) do
+            table.insert(collected, asset)
         end
     end
 
-    table.sort(collectedMG, function(a, b)
-        return a.y < b.y
+    table.sort(collected, function(a, b)
+        return a.z > b.z
     end)
 
-    for a,a1 in pairs(collectedMG) do
-        love.graphics.draw(a1.asset.sprite,layerV:parallaxX(a1.x, math.abs((200-a1.y)/190)),a1.y + 50,0,1,1,a1.asset.sprite:getWidth()/2,a1.asset.sprite:getHeight()/2)
+    for k,v in pairs(collected) do
+        util.sprites:drawObject(v)
     end
 
-    for c,c1 in pairs(infernoM.loadedChunks) do
-        for a,a1 in pairs(c1.foregroundAssets) do
-            love.graphics.draw(a1.asset.sprite,a1.x,a1.y,0,1,1,a1.asset.sprite:getWidth()/2,a1.asset.sprite:getHeight()/2)
-        end
-    end
 
     for c,c1 in pairs(infernoM.loadedChunks) do
-        love.graphics.draw(infernoM.currentLayer.floorSprite,(c1.chunkWidth*c1.idx),125,0,1,1,infernoM.currentLayer.floorSprite:getWidth()/2,infernoM.currentLayer.floorSprite:getHeight()/2)
+        util.sprites:drawObject(c1.chunkFloor)
     end
 end
 
@@ -114,7 +112,19 @@ function layerV:generateChunk(idx)
         },
         foregroundAssets = {},
         midgroundAssets = {},
-        bgFloor = infernoM.currentLayer.bgFloor
+        chunkBGFloor = {
+            x = chunkWidth*idx,
+            y = 100,
+            z = 2,
+            sprite = util.sprites:getSprite("limbo_bg_floor")
+        },
+        chunkFloor = {
+            x = chunkWidth*idx,
+            y = 125,
+            z = 1,
+            sprite = infernoM.currentLayer.floorSprite,
+            scaleY = 1
+        }
         }
 
     local lastX = 0
@@ -124,8 +134,11 @@ function layerV:generateChunk(idx)
             if i - lastX > 110 then
                 lastX = i
                 table.insert(newChunk.foregroundAssets, {
+                    sprite = infernoM.currentLayer.foregroundAssets[1].sprite,
                     asset = infernoM.currentLayer.foregroundAssets[1],
-                    x = pos+i
+                    x = pos+i,
+                    y = 0,
+                    z = 1
                 })
             end
         end
@@ -137,9 +150,11 @@ function layerV:generateChunk(idx)
             if i - lastX2 > 36 then
                 lastX2 = i
                 table.insert(newChunk.midgroundAssets, {
+                    sprite = infernoM.currentLayer.midgroundAssets[1].sprite,
                     asset = infernoM.currentLayer.midgroundAssets[1],
                     x = pos+i,
-                    y = love.math.random(-110,-70)
+                    y = -50,
+                    z = 1.5 + (love.math.random(-2, 1)/5)
                 })
             end
         end

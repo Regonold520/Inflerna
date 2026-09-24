@@ -145,7 +145,7 @@ function infernoM:loadScene()
     util.time:runDeferred(1, function() util.tween:tweenProperty(cam, "y", 0, 2, "CamMoveY", "out") end)
     util.time:runDeferred(1.2, function() util.tween:tweenProperty(playerM.player, "y", 90, 1.5, "PlayerMoveY", "in") end)
     util.time:runDeferred(1, function() util.tween:tweenProperty(infernoIntermission.panel, "y", -250, 2, "IntermissionMoveY", "out") end)
-    util.time:runDeferred(5, function() enemyM:randomLayerSpawn(1, 4, 300) end)
+    util.time:runDeferred(5, function() enemyM:randomLayerSpawn(1, 4, 30000) end)
 end
 
 function infernoM:layerLoaded()

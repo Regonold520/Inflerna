@@ -175,6 +175,10 @@ function sprites:D25Draw(obj)
 
     local z = obj.z or 1
 
+    z = z - cam.z
+
+    if z < 0 then return end
+
     local rotY = 0
 
     if obj.rot ~= nil then
@@ -183,7 +187,12 @@ function sprites:D25Draw(obj)
         end
     end
 
-    local newX = ((obj.x + offsetX - cam.x)/z)
+    local proZ = z
+    if obj.projectZ ~= nil then
+        proZ = obj.projectZ
+    end
+
+    local newX = ((obj.x + offsetX - cam.x)/proZ)
     local newY = ((obj.y + offsetY - cam.y)/z)
 
     local newScaleX = (sX / z) * math.cos(rotY)

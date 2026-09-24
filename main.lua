@@ -44,6 +44,7 @@ end
 cam = {
     x = 0,
     y = -50,
+    z = 0,
     projX=0,
     zoom = 5,
     rot = 0,
@@ -100,10 +101,14 @@ function love.load()
 
 end
 
+local delT = 0
 function love.update(dt)
     if paused then
         return
     end
+
+    delT = delT + dt
+    cam.z = math.sin(delT)*1.5
 
     util.tween:update(dt)
 
