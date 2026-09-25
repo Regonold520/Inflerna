@@ -55,7 +55,7 @@
             cam.roomPos = 0
         end
 
-        util.time:runDeferred(0.5, function() sceneM:switchScene("garden") end)
+        util.time:runDeferred(0.5, function() sceneM:switchScene("test") end)
         
     end
 
