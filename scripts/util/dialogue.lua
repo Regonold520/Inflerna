@@ -4,7 +4,7 @@ dialogue.dialogues = {}
 dialogue.currentActor = nil
 
 dialogue.tutorial = {
-    fullyComplete = true,
+    fullyComplete = false,
     enter = false,
     altarEnter = false,
     altarExplain = false,

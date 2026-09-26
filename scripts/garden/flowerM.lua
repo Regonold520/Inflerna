@@ -555,7 +555,7 @@ end
 
 function flowerM:createPot()
     local newPot = {
-        flower = flowerM:generateRandomFlower(),
+        flower = nil,
         sprite = util.sprites:getSprite("pot"),
         x = 0,
         y = 0,

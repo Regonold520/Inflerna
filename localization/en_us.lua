@@ -12,12 +12,12 @@ return {
                 {text="..."},
                 {text="There is work to be done before you descend."},
                 {text="To your right stands the Altar."},
-                {text="Go to it."}
+                {text="Press [D] to go to the Altar"}
             },
             altarEnter = {
                 {text="Good."},
                 {text="This is where intention takes form."},
-                {text="Proceed with the Altar to use divine craftsmanship"}
+                {text="Click on the Altar to proceed..."}
             },
             altarExplain = {
                 {text="Each symbol before you... is a virtue."},
@@ -32,21 +32,22 @@ return {
             seedCreated = {
                 {text="There."},
                 {text="A seed... born from virtue."},
-                {text="Take it."},
-                {text="Return to the Garden."}
+                {text="Click the new seed to take it to the garden..."},
+                {text="Press [A] to return to the Garden."}
             },
             returnToGarden = {
                 {text="The soil awaits what you have made."},
-                {text="Plant it."}
+                {text="Click on the pot of your new seed to plant it."}
             },
             afterPlant = {
                 {text="A bud of virtue is only the start."},
                 {text="Whilst being a divine treasure, these flowers still require sustenance."},
-                {text='Tend it carefully. What is nearby may help.'}
+                {text='Tend it carefully. Interact with the watering can and then the unbloomed flower of your choice to start naturing...'}
             },
             flowerBloomed = {
                 {text="With even a singular flower, you are able to progress into the depths of Hell"},
-                {text="Meet me in the room to the left when you are ready to descend..."}
+                {text="Meet me in the room to the left when you are ready to descend..."},
+                {text="Press [A] to proceed to the doorway"}
             },
             doorwayEnter = {
                 {text="Behind me stands The Gates To Hell, the bridge from Heaven to Hell."},
