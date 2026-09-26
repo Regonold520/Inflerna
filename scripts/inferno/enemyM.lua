@@ -16,7 +16,7 @@ end
 function enemyM:draw()
 end
 
-local function deepCopy(orig, seen)
+function deepCopy(orig, seen)
     if type(orig) ~= "table" then
         return orig
     end

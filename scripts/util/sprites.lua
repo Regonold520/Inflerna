@@ -201,11 +201,19 @@ function sprites:D25Draw(obj)
     love.graphics.draw(obj.sprite, newX, newY, 0, newScaleX, newScaleY, oX, oY)
 end
 
+function sprites:D25MeshDraw(obj)
+    love.graphics.draw(obj.renderable.mesh, obj.x, obj.y, 0, 1, 1)
+end
+
 function sprites:drawObject(obj)
     if sceneM.currentScene.rendering == sceneM.renderType.D2 then
         sprites:D2Draw(obj)
     elseif sceneM.currentScene.rendering == sceneM.renderType.D25 then
-        sprites:D25Draw(obj)
+        if obj.renderable ~= nil then
+            sprites:D25MeshDraw(obj)
+        else
+            sprites:D25Draw(obj)
+        end
     end
 end
 

@@ -25,6 +25,7 @@ util.hitbox = require("scripts/util/hitbox")
 util.dialogue = require("scripts/util/dialogue")
 util.stateM = require("scripts/util/stateM")
 util.eventM = require("scripts/util/eventM")
+util.renderM = require("scripts/util/renderM")
 
 util.renderTest = require("scripts/util/renderTest")
 
@@ -124,6 +125,8 @@ function love.update(dt)
     util.eventM:update(dt)
 
     util.lovebug:update(dt)
+
+    util.renderM:update(dt)
 
     cpf = 0
 end
