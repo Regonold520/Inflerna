@@ -14,19 +14,19 @@ end
 
 function renderTest:load()
 
-    testMesh = util.renderM:createMeshObject(0, 20, 1, "eden_bg", {
-        {-1.5, 0, 5},
-        { 1.5, 0, 5},
-        { 1.5, 0.1, 1},
-        {-1.5, 0.1, 1}
+    testMesh = util.renderM:createMeshObject(0, 50, 1, "limbo_floor", {
+        {-10.5, 0, 5},
+        { 10.5, 0, 5},
+        { 10.5, 0.1, 0},
+        {-10.5, 0.1, 0}
     })
 
     table.insert(renderTest.drawables, testMesh)
 
     renderTest.testObj = {
-        x = 50,
-        y = 0,
-        z = 5,
+        x = 0,
+        y = 200,
+        z = 3,
         sprite = util.sprites:getSprite("crawler"),
         rot = {
             y = 0

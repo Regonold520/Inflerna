@@ -109,7 +109,6 @@ function love.update(dt)
     end
 
     delT = delT + dt
-    cam.z = math.sin(delT)*1.5
 
     util.tween:update(dt)
 

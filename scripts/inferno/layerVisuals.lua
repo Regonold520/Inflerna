@@ -118,13 +118,14 @@ function layerV:generateChunk(idx)
             z = 2,
             sprite = util.sprites:getSprite("limbo_bg_floor")
         },
-        chunkFloor = {
-            x = chunkWidth*idx,
-            y = 125,
-            z = 1,
-            sprite = infernoM.currentLayer.floorSprite,
-            scaleY = 1
-        }
+        chunkFloor = util.renderM:createMeshObject(chunkWidth*idx, 145,0.5, "limbo_floor", {
+            {-0.5, 0, 1},
+            { 0.5, 0, 1},
+            { 0.5, 0, 0},
+            {-0.5, 0, 0}
+        })
+
+        
         }
 
     local lastX = 0

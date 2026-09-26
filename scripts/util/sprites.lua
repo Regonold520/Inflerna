@@ -202,7 +202,7 @@ function sprites:D25Draw(obj)
 end
 
 function sprites:D25MeshDraw(obj)
-    love.graphics.draw(obj.renderable.mesh, obj.x, obj.y, 0, 1, 1)
+    love.graphics.draw(obj.renderable.mesh, 0, 0, 0, 1, 1)
 end
 
 function sprites:drawObject(obj)

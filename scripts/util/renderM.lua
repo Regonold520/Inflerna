@@ -34,17 +34,26 @@ end
 
 function renderM:fixMeshObj(obj)
     for k,v in pairs(obj.renderable.cornerVertex) do
-        local nX, nY = util.renderM:Vec3ToScreen(obj.renderable.sourceVertex[k][1] + obj.x,
-            obj.renderable.sourceVertex[k][2] + obj.y,
+        local sX = obj.scaleX or 1
+        local sY = obj.scaleY or 1
+
+        local oX = obj.originX or obj.renderable.texture:getWidth()/2
+        local oY = obj.originY or obj.renderable.texture:getHeight()/2
+
+        local localX = (obj.renderable.sourceVertex[k][1] - oX) * sX
+        local localY = (obj.renderable.sourceVertex[k][2] - oY) * sY
+
+
+        local nX, nY = util.renderM:Vec3ToScreen(localX + obj.x,
+            localY + obj.y,
             obj.renderable.rect[k][3] + obj.z)
 
         v[1] = nX
         v[2] = nY
 
-        print("corner: ", v[1], v[2])
     end
 
-    local subdivideVertex = util.renderM:subdivideMesh(obj.renderable.cornerVertex, 100)
+    local subdivideVertex = util.renderM:subdivideMesh(obj.renderable.cornerVertex, 20)
 
     if obj.renderable.mesh == nil then
         local newMesh = love.graphics.newMesh(subdivideVertex, "strip")
