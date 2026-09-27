@@ -29,10 +29,9 @@ util.renderM = require("scripts/util/renderM")
 
 util.renderTest = require("scripts/util/renderTest")
 
-
-util.lovebug =  require("scripts/util/lovebug")
-
 lang = require("localization/en_us")
+
+luasteam = require("lib.luasteam")
 
 cpf = 0
 local paused = false
@@ -73,23 +72,6 @@ function love.load()
     util.hitbox:load()
     util.dialogue:load()
 
-    --[[
-
-    util.lovebug:load()
-
-    util.lovebug:watch("altarM")
-    util.lovebug:watch("gardenM")
-    util.lovebug:watch("enemyM")
-    util.lovebug:watch("battleM")
-    util.lovebug:watch("playerM")
-    util.lovebug:watch("infernoM")
-    util.lovebug:watch("doorwayM")
-    util.lovebug:watch("flowerM")
-    util.lovebug:watch("indexM")
-    util.lovebug:watch("minigameM")
-
-    ]]
-
     sceneM:load()
 
 
@@ -122,8 +104,6 @@ function love.update(dt)
     util.hitbox:update(dt)
     util.dialogue:update(dt)
     util.eventM:update(dt)
-
-    util.lovebug:update(dt)
 
     util.renderM:update(dt)
 

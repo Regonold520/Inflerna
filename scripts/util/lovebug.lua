@@ -1,1 +1,0 @@
-/home/regonold/Projects/Lovebug/client/lovebug.lua

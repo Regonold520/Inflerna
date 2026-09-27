@@ -15,50 +15,50 @@ function input:loopClickers()
     local uiMX, uiMY = love.mouse.getPosition()
 
     for _, obj in pairs(scene.inputObjects) do
-        if obj.active == false or obj.dead or not obj.sprite then goto continue end
+        if obj.active ~= false and not obj.dead and obj.sprite then
 
-        local scaleX, scaleY = obj.scaleX or 1, obj.scaleY or 1
+            local scaleX, scaleY = obj.scaleX or 1, obj.scaleY or 1
 
-        local left, right, top, bottom
-        local mX, mY
+            local left, right, top, bottom
+            local mX, mY
 
-        if obj.isUi then
-            mX, mY = uiMX, uiMY
+            if obj.isUi then
+                mX, mY = uiMX, uiMY
 
-            local halfW = (obj.sprite:getWidth()* cam.zoom* scaleX) / 2
-            local halfH = (obj.sprite:getHeight()* cam.zoom* scaleY) / 2
-            left, right = obj.x - halfW, obj.x + halfW
-            top, bottom = obj.y - halfH, obj.y + halfH
-        else
-            mX, mY = worldMX, worldMY
+                local halfW = (obj.sprite:getWidth()* cam.zoom* scaleX) / 2
+                local halfH = (obj.sprite:getHeight()* cam.zoom* scaleY) / 2
+                left, right = obj.x - halfW, obj.x + halfW
+                top, bottom = obj.y - halfH, obj.y + halfH
+            else
+                mX, mY = worldMX, worldMY
 
-            local halfW = obj.sprite:getWidth()/2 * scaleX
-            local halfH = obj.sprite:getHeight()/2 * scaleY
-            left, right = obj.x - halfW, obj.x + halfW
-            top, bottom = obj.y - halfH, obj.y + halfH
-        end
+                local halfW = obj.sprite:getWidth()/2 * scaleX
+                local halfH = obj.sprite:getHeight()/2 * scaleY
+                left, right = obj.x - halfW, obj.x + halfW
+                top, bottom = obj.y - halfH, obj.y + halfH
+            end
 
-        local hoveringNow = mX > left and mX < right and mY > top and mY < bottom
-        local wasHovering, _ = input:inHovering(obj)
+            local hoveringNow = mX > left and mX < right and mY > top and mY < bottom
+            local wasHovering, _ = input:inHovering(obj)
 
-        if hoveringNow and not wasHovering then
-            if obj.onHoverEnter then obj:onHoverEnter() end
-            table.insert(input.hovering, obj)
-        elseif not hoveringNow and wasHovering then
-            if obj.onHoverExit then obj:onHoverExit() end
-            for i, hObj in ipairs(input.hovering) do
-                if hObj == obj then
-                    table.remove(input.hovering, i)
-                    break
+            if hoveringNow and not wasHovering then
+                if obj.onHoverEnter then obj:onHoverEnter() end
+                table.insert(input.hovering, obj)
+            elseif not hoveringNow and wasHovering then
+                if obj.onHoverExit then obj:onHoverExit() end
+                for i, hObj in ipairs(input.hovering) do
+                    if hObj == obj then
+                        table.remove(input.hovering, i)
+                        break
+                    end
                 end
             end
-        end
 
-        if hoveringNow and obj.onClick then
-            table.insert(collectedLads, obj)
-        end
+            if hoveringNow and obj.onClick then
+                table.insert(collectedLads, obj)
+            end
 
-        ::continue::
+        end
     end
 
     table.sort(collectedLads, function(a,b) return a.layer > b.layer end)
