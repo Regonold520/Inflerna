@@ -13,9 +13,13 @@ function renderM:update(dt)
     currQueryValues = {cam.x, cam.y, cam.z}
     for k,v in pairs(lastQueryValues) do
         if lastQueryValues[k] ~= currQueryValues[k] then
-            for k,v in pairs(renderM.meshes) do
-                renderM:fixMeshObj(v)
-            end
+            runFix = true
+        end
+    end
+
+    if runFix then
+        for k,v in pairs(renderM.meshes) do
+            renderM:fixMeshObj(v)
         end
     end
 
@@ -37,6 +41,8 @@ function renderM:createMeshObject(x, y, z, sprite, rect, divCount)
         renderable = util.renderM:genMeshFromImage(util.sprites:getSprite(sprite), rect, sprite),
         divisions = divCount
     }
+
+    renderM:subdivideMesh(newObj, divCount)
 
     renderM:fixMeshObj(newObj)
 
@@ -66,16 +72,35 @@ function renderM:fixMeshObj(obj)
 
     end
 
-    local subdivideVertex = util.renderM:subdivideMesh(obj.renderable.cornerVertex, obj.divisions)
+    local vertex = obj.renderable.cornerVertex
+
+    local tlX, tlY = vertex[1][1], vertex[1][2]
+    local trX, trY = vertex[2][1], vertex[2][2]
+    local brX, brY = vertex[3][1], vertex[3][2]
+    local blX, blY = vertex[4][1], vertex[4][2]
+
+    for k,v in pairs(obj.renderable.meshVertices) do
+        local topX = lerp(tlX, trX, v[3])
+        local bottomX = lerp(blX, brX, v[3])
+
+        local topY = lerp(tlY, trY, v[3])
+        local bottomY = lerp(blY, brY, v[3])
+
+        local pX = lerp(topX, bottomX, v[4])
+        local pY = lerp(topY, bottomY, v[4])
+
+        v[1] = pX
+        v[2] = pY
+    end
 
     if obj.renderable.mesh == nil then
-        local newMesh = love.graphics.newMesh(subdivideVertex, "strip")
+        local newMesh = love.graphics.newMesh(obj.renderable.meshVertices, "strip")
 
         newMesh:setTexture(obj.renderable.texture)
 
         obj.renderable.mesh = newMesh
     else
-        obj.renderable.mesh:setVertices(subdivideVertex)
+        obj.renderable.mesh:setVertices(obj.renderable.meshVertices)
     end
 end
 
@@ -106,17 +131,20 @@ function renderM:genMeshFromImage(img, rect, tex)
         cornerVertex = v,
         sourceVertex = deepCopy(v),
         rect = rect,
-        texture = util.sprites:getSprite(tex)
+        texture = util.sprites:getSprite(tex),
+        meshVertices = {}
     }
 end
 
-function renderM:subdivideMesh(vertex, level)
+function renderM:subdivideMesh(obj, level)
+    local vertex = obj.renderable.cornerVertex
+
     local tlX, tlY = vertex[1][1], vertex[1][2]
     local trX, trY = vertex[2][1], vertex[2][2]
     local brX, brY = vertex[3][1], vertex[3][2]
     local blX, blY = vertex[4][1], vertex[4][2]
 
-    local subdividedVertex = {}
+    local meshVertices = {}
 
     for x = 0, level do
         for y = 0, level do
@@ -133,18 +161,19 @@ function renderM:subdivideMesh(vertex, level)
             local pY = lerp(topY, bottomY, v)
 
             local newVertex = {pX, pY, u, v}
-            table.insert(subdividedVertex, newVertex)
+
+            table.insert(meshVertices, newVertex)
         end 
     end
     local reordering = {}
 
     for row = 0, level - 1 do
         for column = 0, level do
-            table.insert(reordering, subdividedVertex[(column * (level + 1) + row + 1)])
-            table.insert(reordering, subdividedVertex[(column * (level + 1) + row + 2)])
+            table.insert(reordering, meshVertices[(column * (level + 1) + row + 1)])
+            table.insert(reordering, meshVertices[(column * (level + 1) + row + 2)])
         end
     end
-    return reordering
+    obj.renderable.meshVertices = reordering
 end
 
 

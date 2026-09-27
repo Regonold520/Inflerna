@@ -28,6 +28,8 @@ end
 
 local deltaTimer = 0
 function playerM:update(dt)
+    
+
     deltaTimer = deltaTimer + dt
     playerM.player.scaleY = 1 + math.sin(deltaTimer*2)/20
     playerM.player.scaleX = 1 + math.cos(deltaTimer*2)/20

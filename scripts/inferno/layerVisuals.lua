@@ -34,7 +34,7 @@ function layerV:checkCam()
     end
 
     if layerChange then
-        local render = 100
+        local render = 2
         for i=-render,render do
             layerV:loadChunk(infernoM.currentChunk + i)
         end
@@ -123,7 +123,7 @@ function layerV:generateChunk(idx)
             { 0.5, 0, 1},
             { 0.5, 0, 0},
             {-0.5, 0, 0}
-        }, 5)
+        }, 10)
 
         
         }

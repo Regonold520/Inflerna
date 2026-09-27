@@ -88,6 +88,7 @@ end
 
 local delT = 0
 function love.update(dt)
+    print(love.timer.getFPS())
     if paused then
         return
     end
