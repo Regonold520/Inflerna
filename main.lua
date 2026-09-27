@@ -6,6 +6,7 @@ minigameM = require("scripts/garden/minigameM")
 indexM = require("scripts/garden/indexM")
 
 sceneM = require("scripts/util/sceneM")
+steam = require("luasteam")
 
 infernoIntermission = require("scripts/inferno/infernoIntermission")
 infernoM = require("scripts/inferno/infernoM")
@@ -26,12 +27,12 @@ util.dialogue = require("scripts/util/dialogue")
 util.stateM = require("scripts/util/stateM")
 util.eventM = require("scripts/util/eventM")
 util.renderM = require("scripts/util/renderM")
+util.steamM = require("scripts/util/steamM")
 
 util.renderTest = require("scripts/util/renderTest")
 
 lang = require("localization/en_us")
 
-luasteam = require("lib.luasteam")
 
 cpf = 0
 local paused = false
@@ -65,6 +66,7 @@ function love.load()
     baseWidth = 1466
     baseHeight = 868
 
+    util.steamM:load()
     util.input:load()
     util.sprites:load()
     util.time:load()
@@ -92,6 +94,7 @@ function love.update(dt)
 
     delT = delT + dt
 
+    util.steamM:update(dt)
     util.tween:update(dt)
 
     util.time:update(dt)

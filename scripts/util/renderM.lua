@@ -6,23 +6,36 @@ function renderM:load()
     
 end
 
+local lastQueryValues = {}
+local currQueryValues = {}
 function renderM:update(dt)
-    for k,v in pairs(renderM.meshes) do
-        renderM:fixMeshObj(v)
+    local runFix = false
+    currQueryValues = {cam.x, cam.y, cam.z}
+    for k,v in pairs(lastQueryValues) do
+        if lastQueryValues[k] ~= currQueryValues[k] then
+            for k,v in pairs(renderM.meshes) do
+                renderM:fixMeshObj(v)
+            end
+        end
     end
+
+    lastQueryValues = currQueryValues
 end
 
 function renderM:draw()
     
 end
 
-function renderM:createMeshObject(x, y, z, sprite, rect)
+function renderM:createMeshObject(x, y, z, sprite, rect, divCount)
+    divCount = divCount or 10
+
     local newObj = {
         x = x,
         y = y,
         z = z,
         dirty = false,
         renderable = util.renderM:genMeshFromImage(util.sprites:getSprite(sprite), rect, sprite),
+        divisions = divCount
     }
 
     renderM:fixMeshObj(newObj)
@@ -53,7 +66,7 @@ function renderM:fixMeshObj(obj)
 
     end
 
-    local subdivideVertex = util.renderM:subdivideMesh(obj.renderable.cornerVertex, 20)
+    local subdivideVertex = util.renderM:subdivideMesh(obj.renderable.cornerVertex, obj.divisions)
 
     if obj.renderable.mesh == nil then
         local newMesh = love.graphics.newMesh(subdivideVertex, "strip")

@@ -13,7 +13,6 @@ end
 function battleM:update(dt)
     
     if battleM.currentBattle ~= nil then
-        print(battleM.currentBattle.bulletAnim)
         if battleM.currentBattle.phase == "enemy" then
 
             for e,e1 in pairs(battleM.currentBattle.enemies) do
