@@ -2,13 +2,40 @@ local renderM = {}
 
 renderM.meshes = {}
 
+renderM.workThread = nil
+
+renderM.jobs = love.thread.getChannel("meshJobs")
+renderM.results = love.thread.getChannel("meshResults")
+
 function renderM:load()
+    renderM.workThread = love.thread.newThread("scripts/util/meshThread.lua")
+    renderM.workThread:start()
     
 end
+
+local jobCounter = 0
 
 local lastQueryValues = {}
 local currQueryValues = {}
 function renderM:update(dt)
+    local cont = true
+    while cont do
+        local result = renderM.results:pop()
+
+        if result ~= nil then
+            for k,m in pairs(renderM.meshes) do
+                for k2,v in pairs(m.renderable.pendingJobs) do
+                    if v == result.id then
+                        m.renderable.mesh:setVertices(result.verts)
+                        table.remove(m.renderable.pendingJobs, k2)
+                    end
+                end
+            end
+        else
+            cont = false
+        end
+    end
+
     local runFix = false
     currQueryValues = {cam.x, cam.y, cam.z}
     for k,v in pairs(lastQueryValues) do
@@ -72,26 +99,21 @@ function renderM:fixMeshObj(obj)
 
     end
 
-    local vertex = obj.renderable.cornerVertex
+    --print("SENT", jobCounter)
 
-    local tlX, tlY = vertex[1][1], vertex[1][2]
-    local trX, trY = vertex[2][1], vertex[2][2]
-    local brX, brY = vertex[3][1], vertex[3][2]
-    local blX, blY = vertex[4][1], vertex[4][2]
+    -- send request to recalc verts in thread
 
-    for k,v in pairs(obj.renderable.meshVertices) do
-        local topX = lerp(tlX, trX, v[3])
-        local bottomX = lerp(blX, brX, v[3])
+    renderM.jobs:push({
+        id = jobCounter,
+        cornerVertex = obj.renderable.cornerVertex,
+        meshVertices = obj.renderable.meshVertices
+    })
 
-        local topY = lerp(tlY, trY, v[3])
-        local bottomY = lerp(blY, brY, v[3])
+    table.insert(obj.renderable.pendingJobs, jobCounter)
 
-        local pX = lerp(topX, bottomX, v[4])
-        local pY = lerp(topY, bottomY, v[4])
+    jobCounter = jobCounter + 1
 
-        v[1] = pX
-        v[2] = pY
-    end
+    -- return new meshVertices from thread
 
     if obj.renderable.mesh == nil then
         local newMesh = love.graphics.newMesh(obj.renderable.meshVertices, "strip")
@@ -99,8 +121,6 @@ function renderM:fixMeshObj(obj)
         newMesh:setTexture(obj.renderable.texture)
 
         obj.renderable.mesh = newMesh
-    else
-        obj.renderable.mesh:setVertices(obj.renderable.meshVertices)
     end
 end
 
@@ -132,7 +152,8 @@ function renderM:genMeshFromImage(img, rect, tex)
         sourceVertex = deepCopy(v),
         rect = rect,
         texture = util.sprites:getSprite(tex),
-        meshVertices = {}
+        meshVertices = {},
+        pendingJobs = {}
     }
 end
 

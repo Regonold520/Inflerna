@@ -29,8 +29,6 @@ util.eventM = require("scripts/util/eventM")
 util.renderM = require("scripts/util/renderM")
 util.steamM = require("scripts/util/steamM")
 
-util.renderTest = require("scripts/util/renderTest")
-
 lang = require("localization/en_us")
 
 
@@ -73,6 +71,7 @@ function love.load()
     util.text:load()
     util.hitbox:load()
     util.dialogue:load()
+    util.renderM:load()
 
     sceneM:load()
 
@@ -88,7 +87,6 @@ end
 
 local delT = 0
 function love.update(dt)
-    print(love.timer.getFPS())
     if paused then
         return
     end
@@ -208,4 +206,8 @@ end
 
 function clamp(min, val, max)
     return math.max(min, math.min(val, max));
+end
+
+function lerp(a, b, t)
+    return a * (1-t) + b * t
 end
