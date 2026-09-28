@@ -94,5 +94,11 @@ return {
                 {text="Limbo"}
             }
         }
+    },
+    attackPages = {
+        bloom = {
+            name = "Bloom",
+            description = "Does a thing"
+        }
     }
 }

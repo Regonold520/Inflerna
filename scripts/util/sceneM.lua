@@ -2,6 +2,8 @@
 
     sceneM.scenes = {}
 
+    sceneM.globalScripts = {}
+
     --Enum for the rendering type used in the scene
     -- D2 = 2D, D25 = 2.5D
     sceneM.renderType = {
@@ -26,6 +28,9 @@
         local testScene = sceneM:createScene("test",{
             util.renderTest
         }):renderType(sceneM.renderType.D25)
+
+
+        sceneM:globalContext(attackPageM)
 
         infernoScene.onEnter = function()
             infernoM:loadScene()
@@ -55,8 +60,18 @@
             cam.roomPos = 0
         end
 
+        for k,v in pairs(sceneM.globalScripts) do
+            if v.load ~= nil then
+                v:load()
+            end
+        end
+
         util.time:runDeferred(0.5, function() sceneM:switchScene("garden") end)
         
+    end
+
+    function sceneM:globalContext(scr)
+        table.insert(sceneM.globalScripts, scr)
     end
 
     function sceneM:update(dt)
@@ -65,6 +80,12 @@
                 if f1.update ~= nil then
                     f1:update(dt)
                 end
+            end
+        end
+
+        for k,v in pairs(sceneM.globalScripts) do
+            if v.update ~= nil then
+                v:update(dt)
             end
         end
     end 
@@ -93,6 +114,17 @@
                 if f1.drawUI ~= nil then
                     f1:drawUI()
                 end
+            end
+        end
+
+
+        for k,v in pairs(sceneM.globalScripts) do
+            if v.draw ~= nil then
+                v:draw()
+            end
+
+            if v.drawUI ~= nil then
+                v:drawUI()
             end
         end
     end
