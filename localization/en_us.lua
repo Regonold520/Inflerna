@@ -100,5 +100,11 @@ return {
             name = "Bloom",
             description = "Does a thing"
         }
+    },
+    deeds = {
+        kindness = {
+            name = "Deed of Kindness",
+            desc = "Err, does KIND things"
+        }
     }
 }

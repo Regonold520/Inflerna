@@ -3,7 +3,6 @@ local gardenM = {}
 gardenM.cameraStatic = false
 gardenM.currentTool = ""
 
-local testP = nil
 
 function gardenM:load()
     cam.roomPos = 0
@@ -21,12 +20,8 @@ function gardenM:load()
 
     util.input:addClickable(gardenM.wateringCan,"garden")
 
-    testP = attackPageM:createPage("bloom")
 end
 
-function gardenM:drawUI()
-    attackPageM:renderPage(testP)
-end
 
 gardenM.mX = 0
 gardenM.mY = 0

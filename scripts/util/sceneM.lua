@@ -31,6 +31,7 @@
 
 
         sceneM:globalContext(attackPageM)
+        sceneM:globalContext(deedM)
 
         infernoScene.onEnter = function()
             infernoM:loadScene()
