@@ -29,9 +29,11 @@
             util.renderTest
         }):renderType(sceneM.renderType.D25)
 
-
+        sceneM:globalContext(passiveM)
         sceneM:globalContext(attackPageM)
         sceneM:globalContext(deedM)
+
+        
 
         infernoScene.onEnter = function()
             infernoM:loadScene()

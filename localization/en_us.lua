@@ -106,5 +106,11 @@ return {
             name = "Deed of Kindness",
             desc = "Err, does KIND things"
         }
+    },
+    passives = {
+        kindnessOverload = {
+            name = "Kindness Overload",
+            desc = "All kindness rolls roll -1 less"
+        }
     }
 }

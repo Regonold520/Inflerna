@@ -14,6 +14,7 @@ layerV = require("scripts/inferno/layerVisuals")
 
 attackPageM = require("scripts/inferno/battleSystem/attackPageM")
 deedM = require("scripts/inferno/battleSystem/deedM")
+passiveM = require("scripts/inferno/battleSystem/passiveM")
 
 playerM = require("scripts/inferno/playerM")
 enemyM = require("scripts/inferno/enemyM")

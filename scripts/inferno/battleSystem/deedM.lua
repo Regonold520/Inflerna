@@ -4,6 +4,12 @@ deedM.registeredDeeds = {}
 
 function deedM:load()
     deedM:registerDeeds()
+
+
+
+    local newDeed = deedM:createDeed("kindness")
+
+    print(newDeed.id, #newDeed.passives)
 end
 
 function deedM:update(dt)
@@ -25,13 +31,15 @@ function deedM:registerDeed(id, deedRolls, passives)
 end
 
 function deedM:createDeed(id)
-    local lookup = deedM.registerDeeds[id]
+    local lookup = deedM.registeredDeeds[id]
     local deedLang = lang.deeds[id]
 
     local newPassives = {}
 
     for k,v in pairs(lookup.passives) do
-        -- add passive adding when i make them.
+        local newPassive = passiveM:createPassive(v)
+
+        table.insert(newPassives, newPassive)
     end
 
     local newRolls = {}
@@ -45,7 +53,7 @@ function deedM:createDeed(id)
         deedRolls = newRolls,
         name = deedLang.name,
         desc = deedLang.desc,
-        passives = {},
+        passives = newPassives,
         pages = {}
     }
 
