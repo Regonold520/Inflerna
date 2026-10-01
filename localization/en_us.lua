@@ -105,12 +105,60 @@ return {
         kindness = {
             name = "Deed of Kindness",
             desc = "Err, does KIND things"
+        },
+        chastity = {
+            name = "Deed of Chastity",
+            desc = "Err, does CHASTITY things"
+        },
+        charity = {
+            name = "Deed of Charity",
+            desc = "Err, does CHARITY things"
+        },
+        patience = {
+            name = "Deed of Patience",
+            desc = "Err, does PATIENT things"
+        },
+        temperance = {
+            name = "Deed of Temperance",
+            desc = "Err, does TEMPERATE things"
+        },
+        humility = {
+            name = "Deed of Humility",
+            desc = "Err, does HUMOROUS things"
+        },
+        diligence = {
+            name = "Deed of Diligence",
+            desc = "Err, does DILIGENT things"
         }
     },
     passives = {
         kindnessOverload = {
             name = "Kindness Overload",
             desc = "All kindness rolls roll -1 less"
+        },
+        chastityOverload = {
+            name = "Chastity Overload",
+            desc = "All chastity rolls roll -1 less"
+        },
+        charityOverload = {
+            name = "Charity Overload",
+            desc = "All charity rolls roll -1 less"
+        },
+        patienceOverload = {
+            name = "Patience Overload",
+            desc = "All patience rolls roll -1 less"
+        },
+        temperanceOverload = {
+            name = "Temperance Overload",
+            desc = "All temperance rolls roll -1 less"
+        },
+        humilityOverload = {
+            name = "Humility Overload",
+            desc = "All humility rolls roll -1 less"
+        },
+        diligenceOverload = {
+            name = "Diligence Overload",
+            desc = "All diligence rolls roll -1 less"
         }
     }
 }

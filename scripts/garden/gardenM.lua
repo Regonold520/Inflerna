@@ -3,7 +3,6 @@ local gardenM = {}
 gardenM.cameraStatic = false
 gardenM.currentTool = ""
 
-
 function gardenM:load()
     cam.roomPos = 0
     cam.roomPosY = 0
@@ -19,7 +18,6 @@ function gardenM:load()
     end
 
     util.input:addClickable(gardenM.wateringCan,"garden")
-
 end
 
 
@@ -45,7 +43,6 @@ function gardenM:update(dt)
     cam.y = -10 + gardenM.mY  + cam.yAddition
 
 end
-
 
 local bgs = {"eden_bg_b", "eden_bg_m", "eden_bg_f"}
 local parallaxStrengths = {0.3, 0.25, 0}

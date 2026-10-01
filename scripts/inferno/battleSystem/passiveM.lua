@@ -8,6 +8,12 @@ end
 
 function passiveM:registerPassives()
     passiveM:registerPassive("kindnessOverload", 1)
+    passiveM:registerPassive("chastityOverload", 1)
+    passiveM:registerPassive("charityOverload", 1)
+    passiveM:registerPassive("patienceOverload", 1)
+    passiveM:registerPassive("diligenceOverload", 1)
+    passiveM:registerPassive("temperanceOverload", 1)
+    passiveM:registerPassive("humilityOverload", 1)
 end
 
 function passiveM:update(dt)

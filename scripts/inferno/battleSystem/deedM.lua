@@ -18,6 +18,12 @@ end
 
 function deedM:registerDeeds()
     deedM:registerDeed("kindness", {"kindness"}, {"kindnessOverload"})
+    deedM:registerDeed("charity", {"charity"}, {"charityOverload"})
+    deedM:registerDeed("chastity", {"chastity"}, {"chastityOverload"})
+    deedM:registerDeed("temperance", {"temperance"}, {"temperanceOverload"})
+    deedM:registerDeed("patience", {"patience"}, {"patienceOverload"})
+    deedM:registerDeed("diligence", {"diligence"}, {"diligenceOverload"})
+    deedM:registerDeed("humility", {"humility"}, {"humilityOverload"})
 end
 
 function deedM:registerDeed(id, deedRolls, passives)

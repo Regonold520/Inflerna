@@ -65,7 +65,7 @@ function attackPageM:createPage(id)
             label = util.text:createText("pageTextSlots".. tostring(pageId), "Rollables", util.sprites.pallets.dialogueText, 65,false, false),
         },
         pageId = pageId,
-        rollableVirtues = {"charity", "kindness", "chastity", "temperance", "patience"},
+        rollableVirtues = {"charity"},
         showContext = true
     }
 
